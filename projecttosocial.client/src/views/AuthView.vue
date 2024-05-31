@@ -1,6 +1,6 @@
 <template>
-    <div class="container">
-        <v-card class="px-6 py-8">
+
+        <v-card class="mx-auto container px-6 py-8 ">
             <v-form>
                 <v-text-field
             class="mb-2"
@@ -21,13 +21,13 @@
             size="large"
             type="submit"
             variant="elevated"
+            to="/user"
             block
             >
             Sign In
             </v-btn>
             </v-form>
         </v-card>
-    </div>
 </template>
 
 <script setup lang="ts">
