@@ -1,10 +1,10 @@
 <template>
-    <v-sheet class="bg pa-12" rounded>
-        <v-card class="container ">
+    <div class="container">
+        <v-card class="px-6 py-8">
             <v-form>
                 <v-text-field
             class="mb-2"
-            label="Email"   
+            label="Email"
             clearable
             ></v-text-field>
 
@@ -27,8 +27,7 @@
             </v-btn>
             </v-form>
         </v-card>
-    </v-sheet>
-    
+    </div>
 </template>
 
 <script setup lang="ts">

@@ -1,8 +1,7 @@
 <script setup lang="ts"></script>
 
 <template>
-  <v-app>
-    <v-main>
+    <main>
       <!-- <v-navigation-drawer floating permanent>
         <v-list nav>
           <v-list-item title="Home" to="/">
@@ -19,8 +18,7 @@
         </v-list>
       </v-navigation-drawer> -->
       <router-view></router-view>
-    </v-main>
-  </v-app>
+    </main>
 </template>
 
 <style scoped></style>
