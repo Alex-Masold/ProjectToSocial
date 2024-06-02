@@ -3,26 +3,48 @@ import UserView from '@/views/UserView.vue';
 import TasksView from '@/views/TasksView.vue';
 
 import { createRouter, createWebHistory } from 'vue-router';
+import HomeView from '@/views/HomeView.vue';
+import ChatView from '@/views/ChatView.vue';
+import MainView from '@/views/MainView.vue';
 
 const router = createRouter({
-    history: createWebHistory(import.meta.env.BASE_URL),
-    routes: [
+  history: createWebHistory(import.meta.env.BASE_URL),
+  routes: [
+    {
+      path: '/',
+      name: 'Auth',
+      component: AuthView
+    },
+    {
+      path: '/user',
+      name: 'User',
+      component: UserView,
+      children: [
         {
-            path: '/',
-            name: 'Auth',
-            component: AuthView
+          path: 'home',
+          components: {
+            default: MainView
+          },
+          children: [
+            {
+                path: '',
+                name: 'Home',
+                component: HomeView
+            },
+            {
+            path: 'chat',
+            name: 'Chat',
+            component: ChatView
+          }]
         },
         {
-            path: '/user',
-            name: 'User',
-            component: UserView
-        },
-        {
-            path: '/Tasks',
-            name: 'Tasks',
-            component: TasksView
-            }
-    ]
+          path: 'tasks',
+          name: 'Tasks',
+          component: TasksView
+        }
+      ]
+    }
+  ]
 });
 
 export default router;

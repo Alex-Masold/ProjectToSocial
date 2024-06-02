@@ -1,19 +1,18 @@
 <template>
-    <div>
-        <v-navigation-drawer>
-			<v-list-item-subtitle>
-				<h2 class="subtitle">Личные Сообщения</h2>
-			</v-list-item-subtitle>
-		</v-navigation-drawer>
-    </div>
+  <v-card class="h-screen">
+    <v-card-item>
+      <v-text-field 
+        density="compact" 
+        variant="outlined" 
+        placeholder="Search" 
+        append-icon="mdi-magnify"
+        hide-details="auto" />
+    </v-card-item>
+    <v-divider></v-divider>
+    <v-list> </v-list>
+  </v-card>
 </template>
 
-<script setup lang="ts">
+<script setup lang="ts"></script>
 
-</script>
-	
-<style scoped>
-	.subtitle {
-		padding: 1em;
-	}
-</style>
+<style scoped></style>

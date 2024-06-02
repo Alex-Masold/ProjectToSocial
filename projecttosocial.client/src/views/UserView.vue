@@ -1,20 +1,12 @@
 <template>
-  <v-navigation-drawer permanent >
-    <v-list nav>
-      <v-list-item title="Home" to="/">
-        <template v-slot:prepend>
-          <v-icon icon="mdi-view-dashboard" size="large"></v-icon>
-        </template>
-      </v-list-item>
-      <v-list-item title="Tasks" to="/Tasks">
-        <template v-slot:prepend>
-          <v-icon icon="mdi-pencil-box" size="large"></v-icon>
-        </template>
-      </v-list-item>
-      <v-divider></v-divider>
+  <v-navigation-drawer rail permanent>
+    <v-list nav density="compact">
+      <v-list-item nav prepend-icon="mdi-view-dashboard" to="/user/home" />
+      <v-list-item nav prepend-icon="mdi-pencil-box" to="/user/tasks" />
     </v-list>
+    <v-divider></v-divider>
   </v-navigation-drawer>
-  <router-view></router-view>
+  <router-view />
 </template>
 
 <script setup lang="ts"></script>
