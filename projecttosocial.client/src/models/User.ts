@@ -1,6 +1,6 @@
 import { Chat } from "./Chats";
 import { Message } from "./Message";
-import type { Project } from "./Project";
+import { Project } from "./Project";
 import { Role } from "./Role";
 
 export class User {
@@ -8,6 +8,7 @@ export class User {
     roleId: number;
     firstName: string;
     lastName: string;
+    family: string;
     email: string;
     password: string;
 
@@ -22,6 +23,7 @@ export class User {
         this.roleId = role.id;
         this.firstName = "";
         this.lastName = "";
+        this.family = "";
         this.email = "";
         this.password = "";
 

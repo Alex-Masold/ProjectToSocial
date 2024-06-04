@@ -2,7 +2,7 @@
   <v-card class="h-screen">
     <v-card-item>
       <v-text-field 
-        density="compact" 
+        density="comfortable" 
         variant="outlined" 
         placeholder="Search" 
         append-icon="mdi-magnify"
