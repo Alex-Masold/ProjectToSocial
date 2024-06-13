@@ -1,17 +1,16 @@
-﻿using ProjectToSocial.Server.Models.interfaces;
-using System.Diagnostics.Contracts;
-
-namespace ProjectToSocial.Server.Models
+﻿namespace ProjectToSocial.Server.Models
 {
     public class Message
     {
         public int Id { get; set; }
-        public int UserId { get; set; }
-        public int ChatId { get; set; }
-        public string Text {  get; set; }
-        public DateTime Date {  get; set; }
+        public int? IdUser { get; set; }
+        public int? IdChat { get; set; }
+        public int? IdProject { get; set; }
+        public string? Content {  get; set; }
+        public DateTime? Time {  get; set; }
 
-        public User User { get; set; }
-        public ICommunication Chat { get; set; }    
+        public virtual User? User { get; set; }
+        public virtual Chat? Chat { get; set; }
+        public virtual Project? Project { get; set; }
     }
 }

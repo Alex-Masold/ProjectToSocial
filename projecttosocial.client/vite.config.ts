@@ -55,6 +55,10 @@ export default defineConfig({
             '^/weatherforecast': {
                 target: 'https://localhost:7229/',
                 secure: false
+            },
+            '^/api': {
+                target: 'https://localhost:7229/',
+                secure: false
             }
         },
         port: 5173,

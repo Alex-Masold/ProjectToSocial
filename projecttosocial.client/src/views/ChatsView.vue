@@ -5,10 +5,12 @@
       <v-divider></v-divider>
       <v-list nav density="compact">
         <v-list-item
-          nav
+          v-for="chat in chats"
+          :key="chat.id"
+          :title="chat.secondUser.firstName"
+          :to="{ name: 'Chat', params: { chatId: chat.id } }"
           prepend-icon="mdi-chat"
-          title="user 1"
-          to="/user/home/chat"
+          nav
         />
       </v-list>
     </v-navigation-drawer>
@@ -16,7 +18,13 @@
   </div>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import type { Chat } from '@/models/Chats';
+import { inject, type Ref } from 'vue';
+
+const chats = inject<Ref<Array<Chat>>>('userChats');
+
+</script>
 
 <style scoped>
 .subtitle {

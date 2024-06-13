@@ -2,6 +2,7 @@ import { Chat } from "./Chats";
 import { Message } from "./Message";
 import { Project } from "./Project";
 import { Role } from "./Role";
+import type { Task } from "./Task";
 
 export class User {
     id: number;
@@ -14,9 +15,12 @@ export class User {
 
     role: Role;
 
+    сhatFirstUser: Array<Chat> = [];
+    chatSecondUser: Array<Chat> = [];
     messages: Array<Message> = [];
-    chats: Array<Chat> = [];
     projects: Array<Project> = [];
+    tasks: Array<Task> = [];
+    subtasks: Array<Task> = [];    
     
     constructor(role: Role) {
         this.id = 0;

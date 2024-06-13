@@ -3,9 +3,9 @@ import UserView from '@/views/UserView.vue';
 import TasksView from '@/views/TasksView.vue';
 
 import { createRouter, createWebHistory } from 'vue-router';
-import HomeView from '@/views/HomeView.vue';
 import ChatView from '@/views/ChatView.vue';
-import MainView from '@/views/MainView.vue';
+import SearchView from '@/views/SearchView.vue';
+import ChatsView from '@/views/ChatsView.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -16,24 +16,25 @@ const router = createRouter({
       component: AuthView
     },
     {
-      path: '/user',
-      name: 'User',
+      path: '/:userId',
+      name : 'User',
       component: UserView,
       children: [
         {
-          path: 'home',
+          path: 'chats',
+          name: 'Chats',
           components: {
-            default: MainView
+            default: ChatsView
           },
           children: [
             {
-                path: '',
-                name: 'Home',
-                component: HomeView
+                path: 'search',
+                name: 'Search',
+                component: SearchView
             },
             {
-            path: 'chat',
-            name: 'Chat',
+            path: ':chatId',
+            name: 'Chat',  
             component: ChatView
           }]
         },
