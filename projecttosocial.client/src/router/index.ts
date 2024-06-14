@@ -17,15 +17,12 @@ const router = createRouter({
     },
     {
       path: '/:userId',
-      name : 'User',
       component: UserView,
       children: [
         {
           path: 'chats',
           name: 'Chats',
-          components: {
-            default: ChatsView
-          },
+          component: ChatsView,
           children: [
             {
                 path: 'search',

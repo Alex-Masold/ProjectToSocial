@@ -18,14 +18,13 @@
 
 <script setup lang="ts">
 import axios from 'axios';
-import { ref } from 'vue';
+import { provide, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 let id: string;
 const email = ref<string>('jane.doe@example.com');
 const password = ref<string>('EncryptedPassword2');
 const router = useRouter();
-
 const login = async () => {
   try {
     const response = await axios.post('api/authentication', {
@@ -41,7 +40,7 @@ const login = async () => {
     if (response.status === 200) {
       const data = response.data;
       id = data.id;
-      router.push({ name: 'User', params: { userId: id } });
+      router.replace({ name: 'Search', params: { userId: id } });
     } else {
       const error = response.data;
       console.log(error);
