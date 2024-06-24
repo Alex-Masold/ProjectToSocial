@@ -7,7 +7,7 @@
         public int? IdChat { get; set; }
         public int? IdProject { get; set; }
         public string? Content {  get; set; }
-        public DateTime? Time {  get; set; }
+        public DateTime? Date {  get; set; }
 
         public virtual User? User { get; set; }
         public virtual Chat? Chat { get; set; }

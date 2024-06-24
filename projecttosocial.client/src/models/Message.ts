@@ -1,12 +1,12 @@
-import { Chat } from "./Chats";
+import { Chat } from "./Chat";
 import { Project } from "./Project";
 import { User } from "./User";
 
 export class Message 
 {
     id: number;
-    userId: number;
-    chatId: number;
+    idUser: number;
+    idChat: number;
     content: string;
     date: Date = new Date();
 
@@ -17,8 +17,8 @@ export class Message
     constructor(user: User, chat: Chat, project: Project) 
     {
         this.id = 0;
-        this.chatId = user.id;
-        this.userId = chat.id;
+        this.idUser = chat.id;
+        this.idChat = user.id;
         this.content = "";
 
         this.user = user;

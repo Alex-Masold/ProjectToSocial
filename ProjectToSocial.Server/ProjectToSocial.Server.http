@@ -1,6 +1,3 @@
 @ProjectToSocial.Server_HostAddress = http://localhost:5292
 
-GET {{ProjectToSocial.Server_HostAddress}}/weatherforecast/
-Accept: application/json
-
 ###

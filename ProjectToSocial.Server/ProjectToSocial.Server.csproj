@@ -8,6 +8,7 @@
     <SpaRoot>..\projecttosocial.client</SpaRoot>
     <SpaProxyLaunchCommand>npm run dev</SpaProxyLaunchCommand>
     <SpaProxyServerUrl>https://localhost:5173</SpaProxyServerUrl>
+    <UserSecretsId>b1fb7a7d-e5e0-4526-b54a-d80054378193</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>

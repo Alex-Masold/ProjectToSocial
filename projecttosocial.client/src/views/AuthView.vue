@@ -2,15 +2,24 @@
   <v-container class="fill-height">
     <v-card class="mx-auto container px-6 py-8">
       <v-form @submit.prevent="login">
-        <v-text-field class="mb-2" label="Email" placeholder="Enter your email" v-model="email" clearable></v-text-field>
+        <v-text-field
+          class="mb-2"
+          label="Email"
+          placeholder="Enter your email"
+          v-model="email"
+          clearable
+        ></v-text-field>
 
-        <v-text-field label="Password" placeholder="Enter your password" v-model="password" clearable></v-text-field>
+        <v-text-field
+          label="Password"
+          placeholder="Enter your password"
+          v-model="password"
+          clearable
+        ></v-text-field>
 
         <br />
 
-        <v-btn color="success" size="large" type="submit" variant="elevated" block>
-          Sign In
-        </v-btn>
+        <v-btn block color="success" size="large" type="submit" variant="elevated"> Sign In </v-btn>
       </v-form>
     </v-card>
   </v-container>
@@ -18,29 +27,35 @@
 
 <script setup lang="ts">
 import axios from 'axios';
-import { provide, ref } from 'vue';
+import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 
-let id: string;
-const email = ref<string>('jane.doe@example.com');
-const password = ref<string>('EncryptedPassword2');
+const id = ref<number>(0);
+const email = ref<string>('c');
+const password = ref<string>('c');
 const router = useRouter();
+
 const login = async () => {
   try {
-    const response = await axios.post('api/authentication', {
-      email: email.value,
-      password: password.value
-    }, {
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
+    const response = await axios.post(
+      'https://localhost:7229/api/authentication',
+      {
+        email: email.value,
+        password: password.value
+      },
+      {
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json'
+        }
       }
-    });
+    );
 
     if (response.status === 200) {
       const data = response.data;
-      id = data.id;
-      router.replace({ name: 'Search', params: { userId: id } });
+      console.log(data);
+      id.value = data.id;
+      router.push({ name: 'Search', params: { userId: data.id } });
     } else {
       const error = response.data;
       console.log(error);

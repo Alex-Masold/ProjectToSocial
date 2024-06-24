@@ -33,8 +33,8 @@ namespace ProjectToSocial.Server.Controllers
             using (ApplicationContext db = new ApplicationContext ())
             {
                 var user = await db.Users
-                    .Include(_user => _user.ChatFirstUser)
-                    .ThenInclude(_chat => _chat.SecondUser)
+                    .Include (_user => _user.Chats)
+                    .ThenInclude(_chat => _chat.Users)
                     .Include(_user => _user.Projects)
                     .SingleOrDefaultAsync(_user => _user.Id == id);
                 if (user == null)

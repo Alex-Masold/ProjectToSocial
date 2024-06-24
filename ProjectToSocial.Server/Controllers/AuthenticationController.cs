@@ -15,7 +15,7 @@ namespace ProjectToSocial.Server.Controllers
         {
             _logger = logger;
         }
-
+    
         [HttpPost]
         public async Task<ActionResult<int>> Authentication([FromBody] AuthenticationRequest request)
         {

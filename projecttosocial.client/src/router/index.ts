@@ -1,11 +1,6 @@
-import AuthView from '@/views/AuthView.vue';
-import UserView from '@/views/UserView.vue';
-import TasksView from '@/views/TasksView.vue';
-
 import { createRouter, createWebHistory } from 'vue-router';
-import ChatView from '@/views/ChatView.vue';
-import SearchView from '@/views/SearchView.vue';
-import ChatsView from '@/views/ChatsView.vue';
+
+
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -13,32 +8,33 @@ const router = createRouter({
     {
       path: '/',
       name: 'Auth',
-      component: AuthView
+      component: () => import('@/views/AuthView.vue'),
     },
     {
       path: '/:userId',
-      component: UserView,
+      name: 'User',
+      component: () => import('@/views/UserView.vue'),
       children: [
         {
-          path: 'chats',
-          name: 'Chats',
-          component: ChatsView,
+          path: '',
+          name : 'Chats',
+          component: () => import('@/views/ChatsView.vue'),
           children: [
             {
                 path: 'search',
                 name: 'Search',
-                component: SearchView
+                component: () => import('@/views/SearchView.vue'),
             },
             {
             path: ':chatId',
             name: 'Chat',  
-            component: ChatView
+            component: () => import('@/views/ChatView.vue'),
           }]
         },
         {
           path: 'tasks',
           name: 'Tasks',
-          component: TasksView
+          component: () => import('@/views/TasksView.vue'),
         }
       ]
     }

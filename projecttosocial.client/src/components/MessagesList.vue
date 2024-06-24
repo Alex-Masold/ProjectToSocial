@@ -1,28 +1,30 @@
 <template>
   <v-row class="ma-0">
     <v-sheet class="w-100 messages">
-      <v-container class="pt-0 pb-0">
-        <v-list nav class="d-flex flex-column" density="compact">
-          <div class="your-message-container" v-for="message in messages" :key="message.id">
-            <v-list-item class="content">
-              <p>
-                {{ message.content }}
-              </p>
-            </v-list-item>
-          </div>
+        <v-list nav>
+          <v-list-item
+            :class="{
+              'your-message-container': message.idUser === id,
+              'interlocutor-message-container': message.idUser !== id
+            }"
+            v-for="message in messages"
+            :key="message.id"
+          >          
+            <v-card class="content">
+              <div>{{ message.content }}</div>
+            </v-card>
+          </v-list-item>
         </v-list>
-      </v-container>
     </v-sheet>
   </v-row>
-  <v-row class="ma-0">
-    <v-sheet class="w-100">
-      <v-text-field density="compact" hide-details="auto" append-inner-icon="mdi-send" />
-    </v-sheet>
-  </v-row>
+  
 </template>
 
 <script setup lang="ts">
 import { Message } from '@/models/Message';
+import { inject, type Ref } from 'vue';
+
+const id = inject<Ref<number>>('userId');
 
 const props = defineProps({
   messages: {
@@ -35,10 +37,10 @@ const props = defineProps({
 <style scoped>
 .messages {
   overflow-y: scroll;
-  height: 85vh;
+  height: 83vh;
 }
 .content {
-  max-width: 25em;
+  padding: 0.5em;
 }
 .your-message-container {
   display: flex;

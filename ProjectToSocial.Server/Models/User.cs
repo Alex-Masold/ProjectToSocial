@@ -12,8 +12,7 @@
 
         public Role Role { get; set; }
 
-        public virtual ICollection<Chat> ChatFirstUser { get; set; } = new List<Chat>();
-        public virtual ICollection<Chat> ChatSecondUser { get; set; } = new List<Chat>();
+        public virtual ICollection<Chat> Chats { get; set; } = new List<Chat>();
         public virtual ICollection<Message> Messages { get; set; } = new List<Message>();
         public virtual ICollection<Subtask> Subtasks { get; set; } = new List<Subtask>();
         public virtual ICollection<Project> Projects { get; set; } = new List<Project>();

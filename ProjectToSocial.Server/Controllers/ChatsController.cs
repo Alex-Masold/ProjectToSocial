@@ -16,6 +16,7 @@ namespace ProjectToSocial.Server.Controllers
             using (ApplicationContext db =  new ApplicationContext())
             {
                 var chat = await db.Chats
+                    .Include(_chat => _chat.Users)
                     .Include(_chat => _chat.Messages)
                     .SingleOrDefaultAsync(_chat => _chat.Id == id);
                 if (chat == null)
@@ -28,3 +29,4 @@ namespace ProjectToSocial.Server.Controllers
         }
     }
 }
+    

@@ -41,19 +41,27 @@ public partial class ApplicationContext : DbContext
 
             entity.ToTable("CHATS");
 
-            entity.HasIndex(e => new { e.IdFirstUser, e.IdSecondUser }, "UQ_CHATS_USERS").IsUnique();
-
             entity.Property(e => e.Id).HasColumnName("ID_CHAT");
-            entity.Property(e => e.IdFirstUser).HasColumnName("ID_FIRST_USER");
-            entity.Property(e => e.IdSecondUser).HasColumnName("ID_SECOND_USER");
 
-            entity.HasOne(d => d.FirstUser).WithMany(p => p.ChatFirstUser)
-                .HasForeignKey(d => d.IdFirstUser)
-                .HasConstraintName("FK_CHATS_FIRST_USER_USERS");
+            entity.HasMany(d => d.Users).WithMany(p => p.Chats)
+            .UsingEntity<Dictionary<string, object>>(
+                "ChatsMember",
+                r => r.HasOne<User>().WithMany()
+                    .HasForeignKey("IdUser")
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_USERS_CHAT_MEMBERS"),
+                l => l.HasOne<Chat>().WithMany()
+                    .HasForeignKey("IdChat")
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_CHATS_CHAT_MEMBERS"),
+                j =>
+                {
+                    j.HasKey("IdChat", "IdUser").HasName("PK__CHAT_MEM__7D96560A0FBD7CFD");
+                    j.ToTable("CHAT_MEMBERS");
+                    j.IndexerProperty<int>("IdChat").HasColumnName("ID_CHAT");
+                    j.IndexerProperty<int>("IdUser").HasColumnName("ID_USER");
 
-            entity.HasOne(d => d.SecondUser).WithMany(p => p.ChatSecondUser)
-                .HasForeignKey(d => d.IdSecondUser)
-                .HasConstraintName("FK_CHATS_SECOND_USER_USERS");
+                });
         });
 
         modelBuilder.Entity<Message>(entity =>
@@ -71,7 +79,7 @@ public partial class ApplicationContext : DbContext
             entity.Property(e => e.IdChat).HasColumnName("ID_CHAT");
             entity.Property(e => e.IdProject).HasColumnName("ID_PROJECT");
             entity.Property(e => e.IdUser).HasColumnName("ID_USER");
-            entity.Property(e => e.Time)
+            entity.Property(e => e.Date)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime")
                 .HasColumnName("TIME");

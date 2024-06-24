@@ -1,4 +1,4 @@
-import { Chat } from "./Chats";
+import { Chat } from "./Chat";
 import { Message } from "./Message";
 import { Project } from "./Project";
 import { Role } from "./Role";
@@ -6,7 +6,7 @@ import type { Task } from "./Task";
 
 export class User {
     id: number;
-    roleId: number;
+    idRole: number;
     firstName: string;
     lastName: string;
     family: string;
@@ -15,8 +15,7 @@ export class User {
 
     role: Role;
 
-    сhatFirstUser: Array<Chat> = [];
-    chatSecondUser: Array<Chat> = [];
+    chats: Array<Chat> = [];
     messages: Array<Message> = [];
     projects: Array<Project> = [];
     tasks: Array<Task> = [];
@@ -24,7 +23,7 @@ export class User {
     
     constructor(role: Role) {
         this.id = 0;
-        this.roleId = role.id;
+        this.idRole = role.id;
         this.firstName = "";
         this.lastName = "";
         this.family = "";

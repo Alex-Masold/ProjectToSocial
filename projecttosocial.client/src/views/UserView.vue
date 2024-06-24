@@ -1,8 +1,12 @@
 <template>
   <v-navigation-drawer rail permanent>
     <v-list nav density="compact">
-      <v-list-item nav prepend-icon="mdi-view-dashboard" :to="{name: 'Search', params: {userId: userData?.id}}"/>
-      <v-list-item nav prepend-icon="mdi-pencil-box" to="/user/tasks" />
+      <v-list-item
+        nav
+        prepend-icon="mdi-view-dashboard"
+        :to="{ name: 'Search', params: { userId: userData?.id } }"
+      />
+      <v-list-item nav prepend-icon="mdi-pencil-box" />
     </v-list>
     <v-divider></v-divider>
     <v-list nav density="compact">
@@ -18,7 +22,7 @@
 </template>
 
 <script setup lang="ts">
-import { Chat } from '@/models/Chats';
+import { Chat } from '@/models/Chat';
 import type { User } from '@/models/User';
 import axios from 'axios';
 import { onMounted, provide, ref } from 'vue';
@@ -27,23 +31,26 @@ import { onBeforeRouteUpdate, useRoute } from 'vue-router';
 const route = useRoute();
 const userData = ref<User>();
 const chats = ref<Array<Chat>>([]);
-  provide("userChats", chats);
+const Id = ref(0);
+provide('userChats', chats);
+provide('userId', Id);
 
 onBeforeRouteUpdate(async (to) => {
   const data = await getUser(Number(to.params.userId));
   if (data) {
+    console.log(data + ' ' + 'from onBeforeRouteUpdate');
     userData.value = data;
-    chats.value = data.chatFirstUser || [];
+    Id.value = data.id || 0;
+    chats.value = [...data.chatFirstUser, data.chatSecondUser] || [];
   }
 });
 
 const getUser = async (id: number) => {
   try {
-    const response = await axios.get(`api/users/${id}`);
+    const response = await axios.get(`https://localhost:7229/api/users/${id}`);
 
     if (response.status === 200) {
       const data = response.data;
-      // console.log(data);
       return data;
     } else {
       const error = response.data;
@@ -55,12 +62,14 @@ const getUser = async (id: number) => {
 };
 
 const loadUserData = async () => {
-  const userId = Number(route.params.id);
+  const userId = Number(route.params.userId);
   if (!isNaN(userId)) {
-    const data = await getUser(userId);
+    const data: User = await getUser(userId);
     if (data) {
+      console.log(data + ' ' + 'from loadUserData');
       userData.value = data;
-      chats.value = data.chatFirstUser || [];
+      Id.value = data.id || 0;
+      chats.value = data.chats || [];
     }
   }
 };

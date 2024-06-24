@@ -7,7 +7,7 @@
         <v-list-item
           v-for="chat in chats"
           :key="chat.id"
-          :title="chat.secondUser.firstName"
+          :title="chat.users.find((user: User) => user.id !== userId)?.firstName"
           :to="{ name: 'Chat', params: { chatId: chat.id } }"
           prepend-icon="mdi-chat"
           nav
@@ -19,11 +19,12 @@
 </template>
 
 <script setup lang="ts">
-import type { Chat } from '@/models/Chats';
+import type { Chat } from '@/models/Chat';
+import type { User } from '@/models/User';
 import { inject, type Ref } from 'vue';
 
 const chats = inject<Ref<Array<Chat>>>('userChats');
-
+const userId = inject<Ref<number>>('userId')
 </script>
 
 <style scoped>
