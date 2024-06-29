@@ -18,7 +18,7 @@
       />
     </v-list>
   </v-navigation-drawer>
-  <router-view />
+  <router-view style="width: 100%;"/>
 </template>
 
 <script setup lang="ts">
@@ -41,16 +41,16 @@ onBeforeRouteUpdate(async (to) => {
     console.log(data + ' ' + 'from onBeforeRouteUpdate');
     userData.value = data;
     Id.value = data.id || 0;
-    chats.value = [...data.chatFirstUser, data.chatSecondUser] || [];
+    chats.value = data.chats|| [];
   }
 });
 
-const getUser = async (id: number) => {
+const getUser = async (id: number) =>  {
   try {
     const response = await axios.get(`https://localhost:7229/api/users/${id}`);
 
     if (response.status === 200) {
-      const data = response.data;
+      const data: User = response.data;
       return data;
     } else {
       const error = response.data;
@@ -64,7 +64,7 @@ const getUser = async (id: number) => {
 const loadUserData = async () => {
   const userId = Number(route.params.userId);
   if (!isNaN(userId)) {
-    const data: User = await getUser(userId);
+    const data = await getUser(userId);
     if (data) {
       console.log(data + ' ' + 'from loadUserData');
       userData.value = data;

@@ -2,8 +2,8 @@
 
 <template>
   <v-app>
-    <v-main>
-      <router-view></router-view>
+    <v-main class="h-100vh d-flex flex-row">
+      <router-view ></router-view>
     </v-main>
   </v-app>
 </template>

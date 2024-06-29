@@ -28,7 +28,5 @@ const userId = inject<Ref<number>>('userId')
 </script>
 
 <style scoped>
-.subtitle {
-  padding: 1em;
-}
+
 </style>
