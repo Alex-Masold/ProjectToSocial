@@ -12,6 +12,7 @@ export class User {
     family: string;
     email: string;
     password: string;
+    avatar: string
 
     role: Role;
 
@@ -29,6 +30,7 @@ export class User {
         this.family = "";
         this.email = "";
         this.password = "";
+        this.avatar = "";
 
         this.role = role
     }

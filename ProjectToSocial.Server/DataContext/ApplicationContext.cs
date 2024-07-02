@@ -230,6 +230,13 @@ public partial class ApplicationContext : DbContext
                 .HasMaxLength(50)
                 .IsUnicode(false)
                 .HasColumnName("EMAIL");
+            entity.Property(e => e.Password)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("PASSWORD");
+            entity.Property(e => e.Avatar)
+                .HasMaxLength(2083)
+                .HasColumnName("AVATAR");
             entity.Property(e => e.Family)
                 .HasMaxLength(50)
                 .IsUnicode(false)
