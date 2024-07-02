@@ -14,7 +14,7 @@ namespace ProjectToSocial.Server.Controllers
         public async Task<ActionResult<Message>> AddMessage([FromBody] Message message)
         {
             using (ApplicationContext db =  new ApplicationContext())
-            {
+            {   
                 await db.Messages.AddAsync(message);
                 await db.SaveChangesAsync();
 

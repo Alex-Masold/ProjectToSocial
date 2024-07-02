@@ -29,14 +29,14 @@
       <div class="w-100">
         <v-card
           v-if="isEdit"
-          variant="text"
+          rounded="0"
+          elevation="0"
           density="compact"
-          class="bg-amber"
           :text="prevMessageValue"
         />
         <v-text-field
-          variant="solo"
-          density="default"
+          rounded="0"
+          variant="solo-filled"
           hide-details
           placeholder="Write a message..."
           v-model="messageValue"
@@ -94,8 +94,10 @@ const sendMessage = async () => {
       }
     );
     if (response.status === 200) {
-      const data = response.data;
+      const data: Message = response.data;
+      data.date = new Date(data.date)
       console.log(data);
+
       messages.value.push(data);
       messageValue.value = '';
     }
@@ -176,6 +178,7 @@ const getChat = async (id: number) => {
 
     if (response.status === 200) {
       const data: Chat = response.data;
+      data.messages.map(message => message.date = new Date(message.date))
       return data;
     } else {
       const error = response.data;
@@ -192,6 +195,8 @@ const loadChatData = async () => {
     const data = await getChat(chatId);
     if (data) {
       console.log(data + ' ' + 'from loadChatData');
+      data.messages.map(message => message.date = new Date(message.date))
+
       chatData.value = data;
       messages.value = chatData.value.messages;
       interlocutor.value = data.users.find((user: User) => user.id !== userId?.value);

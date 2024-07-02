@@ -1,23 +1,58 @@
 <template>
-    <v-list nav class="messages-container">
-      <v-list-item
-        :class="{
-          'your-message-container': message.idUser === userId,
-          'interlocutor-message-container': message.idUser !== userId
-        }"
-        v-for="message in messages"
-        :key="message.id"
-        :id="message.id"
-      >
+  <v-list nav class="messages-container">
+    <v-list-item
+      :class="{
+        'your-message-container': message.idUser === userId,
+        'interlocutor-message-container': message.idUser !== userId
+      }"
+      v-for="message in messages"
+      :key="message.id"
+      :id="message.id"
+    >
+      <v-hover v-slot="{ isHovering, props }">
         <v-speed-dial location="end" transition="fade-transition">
           <template v-slot:activator="{ props: activatorProps }">
-            <v-card v-bind="activatorProps" class="content">
-              <div>{{ message.content }}</div>
+            <v-card
+              class="pa-2"
+              :class="{
+                'bg-grey-darken-1': message.idUser === userId,
+                'bg-grey-darken-3': message.idUser !== userId
+              }"
+              :max-width="400"
+              elevation="0"
+              v-bind="activatorProps"
+            >
+              <v-list-item-title class="text-body-1" style="white-space: normal">
+                {{ message.content }}
+              </v-list-item-title>
+              <v-list-item-subtitle v-bind="props" class="d-flex" style="white-space: normal">
+                <span v-if="message.isEdit">Изменнено</span>
+                {{ message.date.getHours() }}:{{ message.date.getMinutes() }}
+                <v-fade-transition>
+                  <v-card variant="text" v-show="isHovering">
+                    &nbsp;
+                    {{
+                      message.date.getDate().toString().length > 1
+                        ? message.date.getDate()
+                        : `0${message.date.getDate()}`
+                    }}.{{
+                      message.date.getMonth().toString().length > 1
+                        ? message.date.getMonth()
+                        : `0${message.date.getMonth()}`
+                    }}.{{ message.date.getFullYear() }}
+                  </v-card>
+                </v-fade-transition>
+              </v-list-item-subtitle>
             </v-card>
           </template>
           <v-btn
             key="1"
-            v-if="message.idUser === userId"
+            v-if="
+              message.idUser === userId &&
+              message.date.getDate() === new Date().getDate() &&
+              message.date.getMonth() === new Date().getMonth() &&
+              message.date.getFullYear() === new Date().getFullYear()
+            "
             icon="mdi-pencil"
             class="bg-grey-darken-3"
             @click="editMessage(message.id, message.content)"
@@ -29,14 +64,15 @@
             @click="deleteMessage(message.id)"
           ></v-btn>
         </v-speed-dial>
-      </v-list-item>
-    </v-list>
+      </v-hover>
+    </v-list-item>
+  </v-list>
 </template>
 
 <script setup lang="ts">
 import { Message } from '@/models/Message';
 import { inject, type Ref } from 'vue';
-import { VSpeedDial } from 'vuetify/components';
+import type { VSpeedDial } from 'vuetify/components';
 
 const emit = defineEmits(['messageDelete', 'messageEdit']);
 
