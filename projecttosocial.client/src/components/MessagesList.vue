@@ -26,7 +26,7 @@
                 {{ message.content }}
               </v-list-item-title>
               <v-list-item-subtitle v-bind="props" class="d-flex" style="white-space: normal">
-                <span v-if="message.isEdit">Изменнено</span>
+                <span v-if="message.isEdit">Изменнено&nbsp;</span>
                 {{ message.date.getHours() }}:{{ message.date.getMinutes() }}
                 <v-fade-transition>
                   <v-card variant="text" v-show="isHovering">

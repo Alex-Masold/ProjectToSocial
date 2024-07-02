@@ -84,7 +84,7 @@ const sendMessage = async () => {
         idUser: userId?.value,
         idChat: chatData.value?.id,
         content: messageValue.value,
-        date: new Date()
+        date: new Date().getTime()
       },
       {
         headers: {
@@ -99,6 +99,52 @@ const sendMessage = async () => {
       console.log(data);
 
       messages.value.push(data);
+      messageValue.value = '';
+    }
+  } catch (error) {
+    console.error('Error logging in:', error);
+  }
+};
+
+const editMessageBehavior = async (Id: number, Content: string) => {
+  isEdit.value = true;
+
+  messageId.value = Id;
+  prevMessageValue.value = Content;
+  messageValue.value = prevMessageValue.value;
+};
+
+const successEditMessageBehavior = async () => {
+  try {
+    const response = await axios.put(
+      'https://localhost:7229/api/messages',
+      {
+        id: messageId.value,
+        idUser: userId?.value,
+        idChat: chatData.value?.id,
+        content: messageValue.value,
+        date: new Date().getTime(),
+        isEdit: true
+      },
+      {
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+    if (response.status === 200) {
+      const data: Message = response.data;
+      console.log(data);
+      let editedMessage: Message = messages.value.find(
+        (message) => message.id == data.id
+      ) as Message;
+      editedMessage.content = data.content;
+      editedMessage.isEdit = data.isEdit;
+      editedMessage.date = new Date(data.date);
+
+      isEdit.value = false;
+      prevMessageValue.value = '';
       messageValue.value = '';
     }
   } catch (error) {
@@ -127,51 +173,6 @@ const deleteMessageBehavior = async (messageId: number) => {
   }
 };
 
-const editMessageBehavior = async (Id: number, Content: string) => {
-  isEdit.value = true;
-
-  messageId.value = Id;
-  prevMessageValue.value = Content;
-  messageValue.value = prevMessageValue.value;
-};
-
-const successEditMessageBehavior = async () => {
-  try {
-    const response = await axios.put(
-      'https://localhost:7229/api/messages',
-      {
-        id: messageId.value,
-        idUser: userId?.value,
-        idChat: chatData.value?.id,
-        content: messageValue.value,
-        date: new Date(),
-        isEdit: true
-      },
-      {
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json'
-        }
-      }
-    );
-    if (response.status === 200) {
-      const data: Message = response.data;
-      console.log(data);
-      let editedMessage: Message = messages.value.find(
-        (message) => message.id == data.id
-      ) as Message;
-      editedMessage.content = data.content;
-      editedMessage.isEdit = data.isEdit;
-      editedMessage.date = new Date(data.date);
-
-      isEdit.value = false;
-      prevMessageValue.value = '';
-      messageValue.value = '';
-    }
-  } catch (error) {
-    console.error('Error logging in:', error);
-  }
-};
 const getChat = async (id: number) => {
   try {
     const response = await axios.get(`https://localhost:7229/api/chats/${id}`);
