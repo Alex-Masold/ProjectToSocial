@@ -2,7 +2,7 @@
 
 <template>
   <v-app>
-    <v-main class="h-100vh d-flex flex-row">
+    <v-main>
       <router-view ></router-view>
     </v-main>
   </v-app>

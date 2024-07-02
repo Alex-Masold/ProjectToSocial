@@ -18,7 +18,7 @@
       />
     </v-list>
   </v-navigation-drawer>
-  <router-view style="width: 100%;"/>
+  <router-view/>
 </template>
 
 <script setup lang="ts">

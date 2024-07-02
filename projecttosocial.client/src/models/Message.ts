@@ -8,6 +8,7 @@ export class Message
     idUser: number;
     idChat: number;
     content: string;
+    isEdit: boolean;
     date: Date = new Date();
 
     user: User;
@@ -19,6 +20,7 @@ export class Message
         this.id = 0;
         this.idUser = chat.id;
         this.idChat = user.id;
+        this.isEdit = false;
         this.content = "";
 
         this.user = user;

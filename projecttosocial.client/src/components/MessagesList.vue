@@ -1,37 +1,36 @@
 <template>
-    <v-sheet class="messages-container">
-      <v-list nav>
-        <v-list-item
-          :class="{
-            'your-message-container': message.idUser === userId,
-            'interlocutor-message-container': message.idUser !== userId
-          }"
-          v-for="message in messages"
-          :key="message.id"
-        >
-          <VSpeedDial location="end" transition="fade-transition">
-            <template v-slot:activator="{ props: activatorProps }">
-              <v-card v-bind="activatorProps" class="content">
-                <div>{{ message.content }}</div>
-              </v-card>
-            </template>
-            <v-btn
-              key="1"
-              v-if="message.idUser === userId"
-              icon="mdi-pencil"
-              class="bg-grey-darken-3"
-              @click="editMessage(message.id, message.content)"
-            ></v-btn>
-            <v-btn
-              key="2"
-              icon="mdi-delete"
-              class="bg-grey-darken-3"
-              @click="deleteMessage(message.id)"
-            ></v-btn>
-          </VSpeedDial>
-        </v-list-item>
-      </v-list>
-    </v-sheet>
+    <v-list nav class="messages-container">
+      <v-list-item
+        :class="{
+          'your-message-container': message.idUser === userId,
+          'interlocutor-message-container': message.idUser !== userId
+        }"
+        v-for="message in messages"
+        :key="message.id"
+        :id="message.id"
+      >
+        <v-speed-dial location="end" transition="fade-transition">
+          <template v-slot:activator="{ props: activatorProps }">
+            <v-card v-bind="activatorProps" class="content">
+              <div>{{ message.content }}</div>
+            </v-card>
+          </template>
+          <v-btn
+            key="1"
+            v-if="message.idUser === userId"
+            icon="mdi-pencil"
+            class="bg-grey-darken-3"
+            @click="editMessage(message.id, message.content)"
+          ></v-btn>
+          <v-btn
+            key="2"
+            icon="mdi-delete"
+            class="bg-grey-darken-3"
+            @click="deleteMessage(message.id)"
+          ></v-btn>
+        </v-speed-dial>
+      </v-list-item>
+    </v-list>
 </template>
 
 <script setup lang="ts">
@@ -43,7 +42,7 @@ const emit = defineEmits(['messageDelete', 'messageEdit']);
 
 const userId = inject<Ref<number>>('userId');
 
-const props = defineProps({
+defineProps({
   messages: {
     type: Array<Message>,
     required: true
@@ -60,11 +59,11 @@ const editMessage = (messageId: number, messageContent: string) => {
 </script>
 
 <style scoped>
-.messages-container{
+.messages-container {
+  scrollbar-width: none;
   overflow: hidden;
 }
-.messages-container:hover
-{
+.messages-container:hover {
   overflow-y: auto;
 }
 .content {

@@ -1,26 +1,30 @@
 <template>
-  <v-container fluid class="ma-0 pa-0 w-100 h-100 d-flex flex-column">
+  <v-container fluid class="ma-0 pa-0 w-100 d-flex flex-column" style="height: 100vh">
     <v-row class="ma-0 flex-grow-0">
-      <v-card
-        elevation="0"
-        class="w-100"
-        :title="`${interlocutor?.firstName} ${interlocutor?.lastName} ${interlocutor?.family}`"
-        :subtitle="`${interlocutor?.email}`"
-      >
-        <template v-slot:append>
-          <v-btn color="grey-lighten-1" icon="mdi-magnify" variant="text"> </v-btn>
-        </template>
-      </v-card>
+      <v-col class="ma-0 pa-0">
+        <v-card
+          elevation="0"
+          :title="`${interlocutor?.firstName} ${interlocutor?.lastName} ${interlocutor?.family}`"
+          :subtitle="`${interlocutor?.email}`"
+        >
+          <template v-slot:append>
+            <v-btn color="grey-lighten-1" icon="mdi-magnify" variant="text"> </v-btn>
+          </template>
+        </v-card>
+      </v-col>
     </v-row>
     <v-sheet>
       <v-divider></v-divider>
     </v-sheet>
-    <messages-list
-    class="flex-grow-1"
-      :messages="messages"
-      @message-delete="deleteMessageBehavior"
-      @message-edit="editMessageBehavior"
-    />
+    <v-row class="ma-0" style="height: 70vh">
+      <messages-list
+        class="position-relative d-flex flex-column h-100 w-100"
+        :messages="messages"
+        @message-delete="deleteMessageBehavior"
+        @message-edit="editMessageBehavior"
+      />
+    </v-row>
+
     <v-row class="ma-0 flex-grow-0">
       <div class="w-100">
         <v-card
@@ -40,7 +44,7 @@
           <template v-slot:append-inner v-if="messageValue && !messageValue?.startsWith(' ')">
             <v-icon
               :icon="isEdit === true ? 'mdi-check' : 'mdi-send'"
-              @click="isEdit === true ? () => {} : sendMessage()"
+              @click="isEdit === true ? successEditMessageBehavior() : sendMessage()"
               @keyup.enter="isEdit === true ? () => {} : sendMessage()"
             />
           </template>
@@ -66,8 +70,9 @@ const messages = ref(Array<Message>());
 const interlocutor = ref<User>();
 
 const isEdit = ref<boolean>(false);
-const prevMessageValue = ref<string>();
+const messageId = ref<number>();
 const messageValue = ref<string>();
+const prevMessageValue = ref<string>();
 
 const userId = inject<Ref<number>>('userId');
 
@@ -120,11 +125,50 @@ const deleteMessageBehavior = async (messageId: number) => {
   }
 };
 
-const editMessageBehavior = async (messageId: number, messageContent: string) => {
-  isEdit.value = !isEdit.value;
-  // isEdit.value = true;
-  prevMessageValue.value = messageContent;
+const editMessageBehavior = async (Id: number, Content: string) => {
+  isEdit.value = true;
+
+  messageId.value = Id;
+  prevMessageValue.value = Content;
   messageValue.value = prevMessageValue.value;
+};
+
+const successEditMessageBehavior = async () => {
+  try {
+    const response = await axios.put(
+      'https://localhost:7229/api/messages',
+      {
+        id: messageId.value,
+        idUser: userId?.value,
+        idChat: chatData.value?.id,
+        content: messageValue.value,
+        date: new Date(),
+        isEdit: true
+      },
+      {
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+    if (response.status === 200) {
+      const data: Message = response.data;
+      console.log(data);
+      let editedMessage: Message = messages.value.find(
+        (message) => message.id == data.id
+      ) as Message;
+      editedMessage.content = data.content;
+      editedMessage.isEdit = data.isEdit;
+      editedMessage.date = new Date(data.date);
+
+      isEdit.value = false;
+      prevMessageValue.value = '';
+      messageValue.value = '';
+    }
+  } catch (error) {
+    console.error('Error logging in:', error);
+  }
 };
 const getChat = async (id: number) => {
   try {
@@ -168,4 +212,10 @@ onBeforeRouteUpdate(async (to) => {
 onMounted(loadChatData);
 </script>
 
-<style scoped></style>
+<style scoped>
+.chat-view {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+</style>

@@ -38,5 +38,30 @@ namespace ProjectToSocial.Server.Controllers
                 return Ok(message.Id);
             }
         }
+
+        [HttpPut]
+        public async Task<ActionResult<Message>> EditMessage(Message messageData)
+        {
+            using (ApplicationContext db = new ApplicationContext())
+            {
+                Message message = await db.Messages.FirstOrDefaultAsync(message =>  message.Id == messageData.Id);
+
+                if (message == null)
+                {
+                    return Content($"Message {messageData.Id} не найдено");
+                }
+                else
+                {
+                    message.IdUser = messageData.IdUser;
+                    message.IdChat = messageData.IdChat;
+                    message.Content = messageData.Content;
+                    message.Date = messageData.Date;
+                    message.IsEdit = messageData.IsEdit;
+
+                    await db.SaveChangesAsync();
+                    return Ok(message);
+                }
+            }
+        }
     }
 }

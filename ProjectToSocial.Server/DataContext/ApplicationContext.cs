@@ -84,6 +84,10 @@ public partial class ApplicationContext : DbContext
                 .HasColumnType("datetime")
                 .HasColumnName("TIME");
 
+            entity.Property(e => e.IsEdit)
+            .HasDefaultValue(false)
+            .HasColumnName("IS_EDIT");
+
             entity.HasOne(d => d.Chat).WithMany(p => p.Messages)
                 .HasForeignKey(d => d.IdChat)
                 .HasConstraintName("FK_CHATS_MESSAGES");
