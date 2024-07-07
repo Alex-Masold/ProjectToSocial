@@ -18,34 +18,36 @@
       />
     </v-list>
   </v-navigation-drawer>
-  <router-view/>
+  <router-view />
 </template>
 
 <script setup lang="ts">
-import { Chat } from '@/models/Chat';
+import type { Chat } from '@/models/Chat';
 import type { User } from '@/models/User';
 import axios from 'axios';
 import { onMounted, provide, ref } from 'vue';
 import { onBeforeRouteUpdate, useRoute } from 'vue-router';
 
 const route = useRoute();
+
+const dialogIconSize: number = 32;
+
+const id = ref(0);
+const dialog = ref<boolean>(false);
+
+const firstName = ref<string>();
+const lastName = ref<string>();
+const family = ref<string>();
+
 const userData = ref<User>();
 const chats = ref<Array<Chat>>([]);
-const Id = ref(0);
+
 provide('userChats', chats);
-provide('userId', Id);
+provide('userId', id);
 
-onBeforeRouteUpdate(async (to) => {
-  const data = await getUser(Number(to.params.userId));
-  if (data) {
-    console.log(data + ' ' + 'from onBeforeRouteUpdate');
-    userData.value = data;
-    Id.value = data.id || 0;
-    chats.value = data.chats|| [];
-  }
-});
 
-const getUser = async (id: number) =>  {
+
+const getUser = async (id: number) => {
   try {
     const response = await axios.get(`https://localhost:7229/api/users/${id}`);
 
@@ -61,6 +63,8 @@ const getUser = async (id: number) =>  {
   }
 };
 
+
+
 const loadUserData = async () => {
   const userId = Number(route.params.userId);
   if (!isNaN(userId)) {
@@ -68,11 +72,21 @@ const loadUserData = async () => {
     if (data) {
       console.log(data + ' ' + 'from loadUserData');
       userData.value = data;
-      Id.value = data.id || 0;
+      id.value = data.id || 0;
       chats.value = data.chats || [];
     }
   }
 };
+
+onBeforeRouteUpdate(async (to) => {
+  const data = await getUser(Number(to.params.userId));
+  if (data) {
+    console.log(data + ' ' + 'from onBeforeRouteUpdate');
+    userData.value = data;
+    id.value = data.id || 0;
+    chats.value = data.chats || [];
+  }
+});
 
 onMounted(loadUserData);
 </script>

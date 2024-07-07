@@ -1,9 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ProjectToSocial.Server.DataContext;
 using ProjectToSocial.Server.Models;
-using static ProjectToSocial.Server.Controllers.MessagesController;
 
 namespace ProjectToSocial.Server.Controllers
 {

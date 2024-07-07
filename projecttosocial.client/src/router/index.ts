@@ -18,7 +18,7 @@ const router = createRouter({
         {
           path: '',
           name : 'Chats',
-          component: () => import('@/views/ChatsView.vue'),
+          component: () => import('@/views/ChatsHavigationView.vue'),
           children: [
             {
                 path: 'search',

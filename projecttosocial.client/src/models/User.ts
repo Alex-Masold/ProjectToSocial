@@ -1,10 +1,10 @@
-import { Chat } from "./Chat";
-import { Message } from "./Message";
-import { Project } from "./Project";
-import { Role } from "./Role";
+import type { Chat } from "./Chat";
+import type { Message } from "./Message";
+import type { Project } from "./Project";
+import type { Role } from "./Role";
 import type { Task } from "./Task";
 
-export class User {
+export interface User {
     id: number;
     idRole: number;
     firstName: string;
@@ -16,23 +16,9 @@ export class User {
 
     role: Role;
 
-    chats: Array<Chat> = [];
-    messages: Array<Message> = [];
-    projects: Array<Project> = [];
-    tasks: Array<Task> = [];
-    subtasks: Array<Task> = [];    
-    
-    constructor(role: Role) {
-        this.id = 0;
-        this.idRole = role.id;
-        this.firstName = "";
-        this.lastName = "";
-        this.family = "";
-        this.email = "";
-        this.password = "";
-        this.avatar = "";
-
-        this.role = role
-    }
-
+    chats: Array<Chat>;
+    messages: Array<Message>;
+    projects: Array<Project>;
+    tasks: Array<Task>;
+    subtasks: Array<Task>;    
 }

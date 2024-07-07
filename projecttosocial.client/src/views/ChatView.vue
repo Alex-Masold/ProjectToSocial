@@ -26,7 +26,7 @@
     </v-row>
 
     <v-row class="ma-0 flex-grow-0">
-      <div class="w-100">
+      <v-col class="pa-0 w-100">
         <v-card
           v-if="isEdit"
           rounded="0"
@@ -49,15 +49,15 @@
             />
           </template>
         </v-text-field>
-      </div>
+      </v-col>
     </v-row>
   </v-container>
 </template>
 
 <script setup lang="ts">
 import MessagesList from '@/components/MessagesList.vue';
-import { Chat } from '@/models/Chat';
-import { Message } from '@/models/Message';
+import type { Chat } from '@/models/Chat';
+import type { Message } from '@/models/Message';
 import type { User } from '@/models/User';
 import axios from 'axios';
 import { inject, onMounted, ref, type Ref } from 'vue';

@@ -1,13 +1,9 @@
-import { Message } from "./Message";
-import { User } from "./User";
+import type { Message } from "./Message";
+import type { User } from "./User";
 
-export class Chat {
+export interface Chat {
     id: number;
     
-    users: Array<User> = [];
-    messages: Array<Message> = [];
-
-    constructor() {
-        this.id = 0;
-    }
+    users: Array<User>;
+    messages: Array<Message>;
 }

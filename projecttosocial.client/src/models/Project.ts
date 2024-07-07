@@ -1,17 +1,12 @@
-import { Message } from "./Message";
-import { Task } from "./Task";
-import { User } from "./User";
+import type { Message } from "./Message";
+import type { Task } from "./Task";
+import type { User } from "./User";
 
-export class Project {
+export interface Project {
     id: number;
     name: string;
 
-    users: Array<User> = [];
-    tasks: Array<Task> = [];
-    messages: Array<Message> = [];
-
-    constructor() {
-        this.id = 0;
-        this.name = "";
-    }
+    users: Array<User>;
+    tasks: Array<Task>;
+    messages: Array<Message> ;
 }

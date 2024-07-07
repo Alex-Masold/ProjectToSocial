@@ -1,8 +1,8 @@
-import { Project } from "./Project";
+import type { Project } from "./Project";
 import type { subtasks } from "./SubTask";
-import { User } from "./User";
+import type { User } from "./User";
 
-export class Task {
+export interface Task {
     id: number;
     idProject: number;  
     idUser: number;
@@ -12,17 +12,4 @@ export class Task {
     project: Project;
     user: User;
     subtasks: Array<subtasks>;
-
-    constructor(project: Project, user: User) {
-        this.id = 0;
-        this.idProject = project.id;
-        this.idUser = user.id;
-        this.content = "";
-        this.completed = false;
-
-        this.project = project;
-        this.user = user;
-        this.subtasks = [];
-    }
-    
 }

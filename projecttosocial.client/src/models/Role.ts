@@ -1,13 +1,8 @@
-import { User } from "./User";
+import type { User } from "./User";
 
-export class Role {
+export interface Role {
     id: number;
     name: string;
 
-    users: Array<User> = [];
-
-    constructor() {
-        this.id = 0;
-        this.name = "";
-    }
+    users: Array<User>;
 }
