@@ -70,9 +70,8 @@
 </template>
 
 <script setup lang="ts">
-import { Message } from '@/models/Message';
+import type { Message } from '@/models/Message';
 import { inject, type Ref } from 'vue';
-import type { VSpeedDial } from 'vuetify/components';
 
 const emit = defineEmits(['messageDelete', 'messageEdit']);
 

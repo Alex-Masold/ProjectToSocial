@@ -2,6 +2,7 @@ import type { Chat } from "./Chat";
 import type { Message } from "./Message";
 import type { Project } from "./Project";
 import type { Role } from "./Role";
+import type { Subtasks } from "./SubTask";
 import type { Task } from "./Task";
 
 export interface User {
@@ -20,5 +21,5 @@ export interface User {
     messages: Array<Message>;
     projects: Array<Project>;
     tasks: Array<Task>;
-    subtasks: Array<Task>;    
+    subtasks: Array<Subtasks>;    
 }
