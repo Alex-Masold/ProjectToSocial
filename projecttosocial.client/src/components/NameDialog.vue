@@ -26,7 +26,11 @@
                     :rules="nameRules"
                     variant="underlined"
                     label="Имя"
-                  ></v-text-field>
+                  >
+                    <template v-slot:message="{ message }">
+                      <span>{{ message }}</span>
+                    </template>
+                  </v-text-field>
                 </v-col>
               </v-row>
               <v-row no-gutters>
@@ -36,7 +40,11 @@
                     :rules="nameRules"
                     variant="underlined"
                     label="Отчество/Второе имя"
-                  ></v-text-field>
+                  >
+                    <template v-slot:message="{ message }">
+                      <span>{{ message }}</span>
+                    </template>
+                  </v-text-field>
                 </v-col>
               </v-row>
               <v-row no-gutters>
@@ -46,7 +54,11 @@
                     :rules="nameRules"
                     variant="underlined"
                     label="Фамилия"
-                  ></v-text-field>
+                  >
+                    <template v-slot:message="{ message }">
+                      <span>{{ message }}</span>
+                    </template>
+                  </v-text-field>
                 </v-col>
               </v-row>
             </v-container>
@@ -58,14 +70,10 @@
               @click="reset(), (isActive.value = !isActive.value)"
             ></v-btn>
             <v-btn
-              :disabled="!valid"
               text="Сохранить"
               variant="text"
-              @click="
-                () => (
-                  editUserName(firstName, lastName, family), (isActive.value = !isActive.value)
-                )
-              "
+              @click="editUserName(firstName, lastName, family)"
+              :disabled="!valid"
             ></v-btn>
           </v-card-actions>
         </v-card>
@@ -75,7 +83,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 
 const props = defineProps({
   firstName: {
@@ -104,18 +112,22 @@ const firstName = ref<string>(props.firstName as string);
 const lastName = ref<string>(props.lastName as string);
 const family = ref<string>(props.family as string);
 
-const valid = ref<boolean>(false);
+const valid = ref<boolean>();
 
 const nameRules = [
   (value: string) => !!value || 'Поле обезаательно для заполнения',
   (value: string) => value.length >= 2 || 'Минимальная длина 2 символа',
-  (value: string) => !/\d/.test(value) || 'Нельзя использовать цифры в поле',
-  (value: string) => !/\s/.test(value) || 'Нельзя использовать пробелы в поле',
-  (value: string) => !/\p{P}/u.test(value) || 'Нельзя использовать знаки пунктуации в поле',
-  (value: string) => !/\p{S}/u.test(value) || 'Нельзя использовать математические знаки в поле',
+  (value: string) =>
+    /^(?!.*'{2})(?!.*’{2})([\p{L}]+(['’][\p{L}]+)*)$/u.test(value) ||
+    'В имени должны быть только буквы',
+  () =>
+    firstName.value + lastName.value + family.value !==
+      `${props.firstName}${props.lastName}${props.family}` || 'Измнения не были внесены'
 ];
 
-// const fullName = computed<string>(() => `${firstName.value}${lastName.value}${family.value}`);
+watch([valid, firstName, lastName, family], () => {
+  validate();
+});
 
 const editUserName = (firstName: string, lastName: string, family: string): void => {
   emit('editUserName', firstName, lastName, family);
@@ -126,7 +138,10 @@ const reset = (): void => {
   lastName.value = props.lastName as string;
   family.value = props.family as string;
 };
+
+const validate = (): void => {
+  form.value?.validate();
+};
 </script>
 
-<style>
-</style>
+<style></style>

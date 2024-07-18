@@ -39,7 +39,10 @@
             </v-col>
 
             <v-col>
-              <PasswordDialog :password="password" @edit-user-password="editUserPasswordBehavior"/>
+              <PasswordDialog
+                :error-message="passwordMessage"
+                @edit-user-password="editUserPasswordBehavior"
+              />
             </v-col>
           </v-row>
         </VContainer>
@@ -73,6 +76,9 @@ const password = ref<string>();
 const chats = ref<Array<Chat>>();
 const projects = ref<Array<Project>>();
 
+const emailMessage = ref<string>();
+const passwordMessage = ref<string>();
+
 const dialog = ref<boolean>(false);
 
 provide('userChats', chats);
@@ -80,7 +86,7 @@ provide('userId', id);
 
 const getUser = async (id: number) => {
   try {
-    const response = await axios.get(`https://localhost:7229/api/users/${id}`);
+    const response = await axios.get(`https://localhost:7229/api/user/${id}`);
 
     if (response.status === 200) {
       const data: User = response.data;
@@ -94,10 +100,14 @@ const getUser = async (id: number) => {
   }
 };
 
-const editUserNameBehavior = async (newFirstName: string, newLastName: string, newFamily: string) => {
+const editUserNameBehavior = async (
+  newFirstName: string,
+  newLastName: string,
+  newFamily: string
+) => {
   try {
     const response = await axios.put(
-      'https://localhost:7229/api/users',
+      'https://localhost:7229/api/user',
       {
         id: id.value,
         firstName: newFirstName,
@@ -124,15 +134,15 @@ const editUserNameBehavior = async (newFirstName: string, newLastName: string, n
         family.value = data.get('Family');
       }
     }
-  } catch (error) {
-    console.error('Error editing user Name in:', error);
+  } catch (error: any) {
+    console.error('Error editing user name in:', error);
   }
 };
 
 const editUserEmailBehavior = async (newEmail: string) => {
   try {
     const response = await axios.put(
-      'https://localhost:7229/api/users',
+      'https://localhost:7229/api/user',
       {
         id: id.value,
         email: newEmail
@@ -157,10 +167,10 @@ const editUserEmailBehavior = async (newEmail: string) => {
   }
 };
 
-const editUserPasswordBehavior = async (newPassword: string) => {
-  try {
-    const response = await axios.put(
-      'https://localhost:7229/api/users',
+const editUserPasswordBehavior = async (newPassword: string) =>
+  await axios
+    .put(
+      'https://localhost:7229/api/user',
       {
         id: id.value,
         password: newPassword
@@ -171,16 +181,25 @@ const editUserPasswordBehavior = async (newPassword: string) => {
           'Content-Type': 'application/json'
         }
       }
-    );
-    if (response.status === 200) {
-      const data: Map<string, string> = new Map<string, string>(Object.entries(response.data));
-
-      password.value = data.get('password') as string;
-    }
-  } catch (error) {
-    console.error('Error editing user Password in:', error);
-  }
-};
+    )
+    .then((response) => {
+      if (response.status === 200) {
+        const data: Map<string, string> = new Map<string, string>(Object.entries(response.data));
+        // console.log(data);
+        if (data.has('password')) {
+          password.value = data.get('password') as string;
+        }
+      }
+    })
+    .catch((error) => {
+      if (error.response) {
+        if (error.response.status === 400) {
+          let errorMessage = error.response.data.errors[0];
+          console;
+          console.log(errorMessage);
+        }
+      }
+    });
 
 const fillUser = (userData: User): void => {
   id.value = userData.id;
@@ -225,4 +244,5 @@ onMounted(loadUserData);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}</style>
+}
+</style>

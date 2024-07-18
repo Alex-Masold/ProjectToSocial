@@ -21,7 +21,7 @@
             <v-row no-gutters>
               <v-col>
                 <v-text-field
-                  v-model="email"
+                  v-model="newEmail"
                   :rules="emailRules"
                   variant="underlined"
                   label="email"
@@ -36,7 +36,7 @@
               :disabled="!valid"
               text="изменить email"
               variant="text"
-              @click="() => (editUserEmail(email), (isActive.value = !isActive.value))">
+              @click="() => (editUserEmail(newEmail), (isActive.value = !isActive.value))">
             </v-btn>
           </v-card-actions>
         </v-card>
@@ -61,22 +61,24 @@ const props = defineProps({
 
 const emit = defineEmits(['editUserEmail']);
 
-const email = ref<string>(props.email as string);
+const newEmail = ref<string>("");
 
 const valid = ref(false);
 
-const editUserEmail = (email: string) => {
-  emit('editUserEmail', email);
-};
-
 const emailRules = [
   (value: string) => !!value || 'Поле обезаательно для заполнения',
+  (value: string) => value !== props.email || 'Это текущий email',
   (value: string) => {
     const pattern =
       /^([a-zA-Z0-9]+(\.[a-zA-Z0-9]+)*)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     return pattern.test(value) || 'Неверный email';
   }
 ];
+
+const editUserEmail = (email: string) => {
+  emit('editUserEmail', email);
+};
+
 </script>
 
 <style scoped></style>

@@ -1,4 +1,6 @@
-﻿namespace ProjectToSocial.Server.Models
+﻿using System.Buffers.Text;
+
+namespace ProjectToSocial.Server.Models
 {
     public class User
     {

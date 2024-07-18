@@ -1,18 +1,16 @@
-﻿using System.Runtime.InteropServices;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Data.SqlClient;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using ProjectToSocial.Server.DataContext;
 using ProjectToSocial.Server.Models;
 
 namespace ProjectToSocial.Server.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api")]
     [ApiController]
-    public class UsersController : ControllerBase
+    public partial class UsersController : ControllerBase
     {
-        [HttpGet]
+        [HttpGet("users")]
         public async Task<ActionResult<ICollection<User>>> GetUsers()
         {
             using (ApplicationContext db = new ApplicationContext())
@@ -27,13 +25,13 @@ namespace ProjectToSocial.Server.Controllers
             }
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("user/{id}")]
         public async Task<ActionResult<User>> GetUser(int id)
         {
             using (ApplicationContext db = new ApplicationContext())
             {
-                var user = await db
-                    .Users.Include(_user => _user.Chats)
+                var user = await db.Users
+                    .Include(_user => _user.Chats)
                     .ThenInclude(_chat => _chat.Users)
                     .Include(_user => _user.Projects)
                     .SingleOrDefaultAsync(_user => _user.Id == id);
@@ -46,99 +44,129 @@ namespace ProjectToSocial.Server.Controllers
             }
         }
 
-        [HttpPut]
+        [HttpPut("user")]
         public async Task<ActionResult<Dictionary<string, object>>> EditUser(
             [FromBody] UserQuery userData
         )
-                {
+        {
             using (ApplicationContext db = new ApplicationContext())
             {
                 User user = await db.Users.FirstOrDefaultAsync(user => user.Id == userData.Id);
 
-                bool isModified = false;
                 var changedFields = new Dictionary<string, object>();
 
                 if (user == null)
                 {
                     return Content($"User {userData.Id} не найден");
                 }
-                else
+
+                if (userData.IdRole != null)
                 {
-                    if (user.IdRole != userData.IdRole && userData.IdRole != null)
+                    if (userData.IdRole == 0)
+                    {
+                        ModelState.AddModelError(nameof(UserQuery.IdRole), "Пустое значение");
+                    }
+                    if (user.IdRole.Equals(userData.IdRole))
+                    {
+                        ModelState.AddModelError(nameof(UserQuery.IdRole), "Были введены старые данные");
+                    }
+                    if (user.IdRole >= db.Roles.Count())
+                    {
+                        ModelState.AddModelError(nameof(UserQuery.IdRole), "Значение отсутствует");
+                    }
+                    if (ModelState.IsValid)
                     {
                         user.IdRole = Convert.ToInt32(userData.IdRole);
-                        changedFields["IdRole"] = userData.IdRole;
-                        isModified = true;
-                    }
-                    if (
-                        user.FirstName != userData.FirstName
-                        && !string.IsNullOrEmpty(userData.FirstName)
-                    )
-                    {
-                        user.FirstName = userData.FirstName;
-                        changedFields["FirstName"] = userData.FirstName;
-                        isModified = true;
-                    }
-                    if (
-                        user.LastName != userData.LastName
-                        && !string.IsNullOrEmpty(userData.LastName)
-                    )
-                    {
-                        user.LastName = userData.LastName;
-                        changedFields["LastName"] = userData.LastName;
-                        isModified = true;
-                    }
-                    if (user.Family != userData.Family && !string.IsNullOrEmpty(userData.Family))
-                    {
-                        user.Family = userData.Family;
-                        changedFields["Family"] = userData.Family;
-                        isModified = true;
-                    }
-                    if (user.Email != userData.Email && !string.IsNullOrEmpty(userData.Email))
-                    {
-                        user.Email = userData.Email;
-                        changedFields["Email"] = userData.Email;
-                        isModified = true;
-                    }
-                    if (
-                        user.Password != userData.Password
-                        && !string.IsNullOrEmpty(userData.Password)
-                    )
-                    {
-                        user.Password = userData.Password;
-                        changedFields["Password"] = userData.Password;
-                        isModified = true;
-                    }
-                    if (user.Avatar != userData.Avatar && !string.IsNullOrEmpty(userData.Avatar))
-                    {
-                        user.Avatar = userData.Avatar;
-                        changedFields["Avatar"] = userData.Avatar;
-                        isModified = true;
-                    }
-
-                    if (isModified)
-                    {
-                        await db.SaveChangesAsync();
-                        return Ok(changedFields);
-                    }
-                    else
-                    {
-                    return Content("Нет изменений");
+                        changedFields[nameof(UserQuery.IdRole)] = userData.IdRole;
                     }
                 }
-            }
-        }
+                if (!userData.FirstName.IsNullOrEmpty() ||
+                    !userData.LastName.IsNullOrEmpty()  ||
+                    !userData.Family.IsNullOrEmpty())
+                {
+                    if ($"{userData.FirstName}{userData.LastName}{userData.Family}" == $"{user.FirstName}{user.LastName}{user.Family}")
+                    {
+                        ModelState.AddModelError("", "Были введены старые данные");
+                    }
+                    if (ModelState.IsValid)
+                    {
+                        if (user.FirstName != userData.FirstName)
+                        {
+                            user.FirstName = userData.FirstName;
+                            changedFields[nameof(UserQuery.FirstName)] = userData.FirstName;
+                        }
+                        if (user.LastName != userData.LastName)
+                        {
+                            user.LastName = userData.LastName;
+                            changedFields[nameof(UserQuery.LastName)] = userData.LastName;
+                        }
+                        if (user.Family != userData.Family)
+                        {
+                            user.Family = userData.Family;
+                            changedFields[nameof(UserQuery.Family)] = userData.Family;
+                        }
+                    }
+                }
 
-        public class UserQuery
-        {
-            public int Id { get; set; }
-            public int? IdRole { get; set; }
-            public string? FirstName { get; set; }
-            public string? LastName { get; set; }
-            public string? Family { get; set; }
-            public string? Email { get; set; }
-            public string? Password { get; set; }
-            public string? Avatar { get; set; }
+
+                if (!string.IsNullOrEmpty(userData.Email))
+                {
+                    if (userData.Email == user.Email)
+                    {
+                        ModelState.AddModelError(nameof(UserQuery.Email), "Был введен старыц Email");
+                    }
+                    if (db.Users.Any(user => user.Email == userData.Email))
+                    {
+                        ModelState.AddModelError(nameof(UserQuery.Email), "Email Уже занят");
+                    }
+                    if (ModelState.IsValid)
+                    {
+                        user.Email = userData.Email;
+                        changedFields[nameof(UserQuery.Email)] = userData.Email;
+                    }
+                }
+                if (!string.IsNullOrEmpty(userData.Password))
+                {
+                    if (userData.Password == user.Password)
+                    {
+                        ModelState.AddModelError(nameof(UserQuery.Password), "Нельзя использовать старый пароль");
+                    }
+                    if (
+                        userData.Password == $"{user.FirstName}{user.LastName}{user.Family}"||
+                        userData.Password == user.FirstName ||
+                        userData.Password == user.LastName ||
+                        userData.Password == user.Family ||
+                        userData.Password == $"{userData.FirstName}{userData.LastName}{userData.Family}"||
+                        userData.Password == userData.FirstName ||
+                        userData.Password == userData.LastName ||
+                        userData.Password == userData.Family)
+                    {
+                        ModelState.AddModelError("", "Пароль не должен быть равен Имени");
+                    }
+                    if (ModelState.IsValid)
+                    {
+                        user.Password = userData.Password;
+                        changedFields[nameof(UserQuery.Password)] = userData.Password;
+                    }
+
+                }
+                if (user.Avatar != userData.Avatar && !string.IsNullOrEmpty(userData.Avatar))
+                {
+                    user.Avatar = userData.Avatar;
+                    changedFields[nameof(UserQuery.Avatar)] = userData.Avatar;
+                }
+
+                if (ModelState.IsValid)
+                {
+                    await db.SaveChangesAsync();
+                    return Ok(changedFields);
+                }
+                else
+                {
+                    return BadRequest(new ValidationProblemDetails(ModelState));
+                }
+
+            }
         }
     }
 }
