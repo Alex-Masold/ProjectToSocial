@@ -74,11 +74,6 @@ namespace ProjectToSocial.Server.Controllers
                     {
                         ModelState.AddModelError(nameof(UserQuery.IdRole), "Значение отсутствует");
                     }
-                    if (ModelState.IsValid)
-                    {
-                        user.IdRole = Convert.ToInt32(userData.IdRole);
-                        changedFields[nameof(UserQuery.IdRole)] = userData.IdRole;
-                    }
                 }
                 if (!userData.FirstName.IsNullOrEmpty() ||
                     !userData.LastName.IsNullOrEmpty()  ||
@@ -88,44 +83,20 @@ namespace ProjectToSocial.Server.Controllers
                     {
                         ModelState.AddModelError("", "Были введены старые данные");
                     }
-                    if (ModelState.IsValid)
-                    {
-                        if (user.FirstName != userData.FirstName)
-                        {
-                            user.FirstName = userData.FirstName;
-                            changedFields[nameof(UserQuery.FirstName)] = userData.FirstName;
-                        }
-                        if (user.LastName != userData.LastName)
-                        {
-                            user.LastName = userData.LastName;
-                            changedFields[nameof(UserQuery.LastName)] = userData.LastName;
-                        }
-                        if (user.Family != userData.Family)
-                        {
-                            user.Family = userData.Family;
-                            changedFields[nameof(UserQuery.Family)] = userData.Family;
-                        }
-                    }
                 }
 
-
-                if (!string.IsNullOrEmpty(userData.Email))
+                if (!userData.Email.IsNullOrEmpty())
                 {
                     if (userData.Email == user.Email)
                     {
-                        ModelState.AddModelError(nameof(UserQuery.Email), "Был введен старыц Email");
+                        ModelState.AddModelError(nameof(UserQuery.Email), "Был введен старый Email");
                     }
                     if (db.Users.Any(user => user.Email == userData.Email))
                     {
                         ModelState.AddModelError(nameof(UserQuery.Email), "Email Уже занят");
                     }
-                    if (ModelState.IsValid)
-                    {
-                        user.Email = userData.Email;
-                        changedFields[nameof(UserQuery.Email)] = userData.Email;
-                    }
                 }
-                if (!string.IsNullOrEmpty(userData.Password))
+                if (!userData.Password.IsNullOrEmpty())
                 {
                     if (userData.Password == user.Password)
                     {
@@ -143,21 +114,50 @@ namespace ProjectToSocial.Server.Controllers
                     {
                         ModelState.AddModelError("", "Пароль не должен быть равен Имени");
                     }
-                    if (ModelState.IsValid)
-                    {
-                        user.Password = userData.Password;
-                        changedFields[nameof(UserQuery.Password)] = userData.Password;
-                    }
-
                 }
+
                 if (user.Avatar != userData.Avatar && !string.IsNullOrEmpty(userData.Avatar))
                 {
-                    user.Avatar = userData.Avatar;
-                    changedFields[nameof(UserQuery.Avatar)] = userData.Avatar;
                 }
 
                 if (ModelState.IsValid)
                 {
+                    if (userData.IdRole != null)
+                    {
+                        user.IdRole = Convert.ToInt32(userData.IdRole);
+                        changedFields[nameof(UserQuery.IdRole)] = userData.IdRole;
+                    }
+                    if (!userData.FirstName.IsNullOrEmpty() && user.FirstName != userData.FirstName)
+                    {
+                        user.FirstName = userData.FirstName;
+                        changedFields[nameof(UserQuery.FirstName)] = userData.FirstName;
+                    }
+                    if (!userData.LastName.IsNullOrEmpty() && user.LastName != userData.LastName)
+                    {
+                        user.LastName = userData.LastName;
+                        changedFields[nameof(UserQuery.LastName)] = userData.LastName;
+                    }
+                    if (!userData.Family.IsNullOrEmpty() && user.Family != userData.Family)
+                    {
+                        user.Family = userData.Family;
+                        changedFields[nameof(UserQuery.Family)] = userData.Family;
+                    }
+                    if (!userData.Email.IsNullOrEmpty())
+                    {
+                        user.Email = userData.Email;
+                        changedFields[nameof(UserQuery.Email)] = userData.Email;
+                    }
+                    if (!userData.Password.IsNullOrEmpty())
+                    {
+                        user.Password = userData.Password;
+                        changedFields[nameof(UserQuery.Password)] = userData.Password;
+                    }
+                    if (userData.Avatar.IsNullOrEmpty())
+                    {
+                        user.Avatar = userData.Avatar;
+                        changedFields[nameof(UserQuery.Avatar)] = userData.Avatar;
+                    }
+
                     await db.SaveChangesAsync();
                     return Ok(changedFields);
                 }
