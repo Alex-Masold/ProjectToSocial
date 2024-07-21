@@ -1,5 +1,5 @@
 <template>
-  <v-dialog width="auto" persistent>
+  <v-dialog v-model="isActive" width="auto" persistent>
     <template v-slot:activator="{ props: activatorProps }">
       <v-btn block v-bind="activatorProps" variant="text" style="justify-content: space-between">
         <template v-slot:prepend>
@@ -11,8 +11,9 @@
         </template>
       </v-btn>
     </template>
-    <template v-slot:default="{ isActive }">
-      <v-form ref="form" v-model="valid">
+
+    <template v-slot:default>
+      <v-form v-model="isValid">
         <v-card title="Редактирование пароля">
           <v-card-text>
             <VRow no-gutters>
@@ -22,14 +23,12 @@
                   variant="underlined"
                   label="Пароль"
                   :rules="newPasswordRules"
+                  :messages="$props.errorMessages ? $props.errorMessages : ''"
                   :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
                   :type="showPassword ? 'text' : 'password'"
                   @click:append="showPassword = !showPassword"
                 >
-                <template v-slot:message="{ message }">
-                  <span>{{ message || props.errorMessage }}</span>
-                </template>
-              </VTextField>
+                </VTextField>
               </VCol>
             </VRow>
             <VRow no-gutters>
@@ -39,6 +38,7 @@
                   variant="underlined"
                   label="Повторите пароль"
                   :rules="passwordConfirmRules"
+                  :messages="$props.errorMessages ? $props.errorMessages : ''"
                   :append-icon="showConfirm ? 'mdi-eye' : 'mdi-eye-off'"
                   :type="showConfirm ? 'text' : 'password'"
                   @click:append="showConfirm = !showConfirm"
@@ -47,21 +47,13 @@
             </VRow>
           </v-card-text>
           <VCardActions>
+            <VBtn text="Отмена" variant="text" @click="resetDialog"></VBtn>
             <VBtn
-              text="Отмена"
-              variant="text"
-              @click="reset(), (isActive.value = !isActive.value)"
-            ></VBtn>
-            <VBtn
-              :disabled="!valid"
-              text="Потвердить" 
+              text="Потвердить"
               type="submit"
               variant="text"
-              @click="
-                editUserPassword(newPassword, passwordConfirm),
-                  reset(),
-                  (isActive.value = !isActive.value)
-              "
+              :disabled="!isValid"
+              @click="editUserPassword(newPassword, passwordConfirm)"
             ></VBtn>
           </VCardActions>
         </v-card>
@@ -74,7 +66,7 @@
 import { ref } from 'vue';
 
 const props = defineProps({
-  errorMessage: {
+  errorMessages: {
     type: String,
     requare: true
   },
@@ -84,12 +76,14 @@ const props = defineProps({
   }
 });
 
-const emit = defineEmits(['editUserPassword']);
+const emit = defineEmits(['editUserPassword', 'resetDialog']);
+
+const isValid = defineModel<boolean>('isValid', { required: true });
+const isActive = defineModel<boolean>('isActive', { required: true });
 
 const newPassword = ref<string>('');
 const passwordConfirm = ref<string>('');
 
-const valid = ref<boolean>(false);
 const showPassword = ref<boolean>(false);
 const showConfirm = ref<boolean>(false);
 
@@ -109,10 +103,12 @@ const editUserPassword = (password: string, passwordConfirm: string) => {
   emit('editUserPassword', password, passwordConfirm);
 };
 
-const reset = (): void => {
+const resetDialog = (): void => {
+  emit('resetDialog', 'PasswordDialog');
   newPassword.value = '';
   passwordConfirm.value = '';
   showPassword.value = false;
+  showConfirm.value = false;
 };
 </script>
 

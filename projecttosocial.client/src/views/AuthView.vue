@@ -31,7 +31,7 @@ import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 const id = ref<number>(0);
-const email = ref<string>('admin@admin.com');
+const email = ref<string>('admin@gmail.com');
 const password = ref<string>('JustAdmin');
 const router = useRouter();
 

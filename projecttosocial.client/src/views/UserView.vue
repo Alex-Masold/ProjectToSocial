@@ -1,7 +1,54 @@
 <template>
   <v-navigation-drawer rail permanent>
     <v-list nav density="compact">
-      <v-list-item nav prepend-icon="mdi-account" to="" @click="dialog = true"> </v-list-item>
+      <v-dialog width="auto">
+        <template v-slot:activator="{ props: activatorProps }">
+          <v-list-item nav prepend-icon="mdi-account" v-bind="activatorProps"> </v-list-item>
+        </template>
+        <template v-slot:default>
+          <v-card title="Информация об аккаунте" max-width="400">
+            <v-card-text>
+              <VContainer class="ma-0 pa-0">
+                <v-row>
+                  <v-col>
+                    <NameDialog
+                      v-model:is-valid="isValid"
+                      v-model:is-active="isActiveNameDialog"
+                      :first-name="firstName"
+                      :last-name="lastName"
+                      :family="family"
+                      :error-messages="nameMessages"
+                      @edit-user-name="editUserNameBehavior"
+                      @reset-dialog="resetDialogBehavior"
+                    />
+                  </v-col>
+
+                  <v-col>
+                    <email-dialog
+                      v-model:is-valid="isValid"
+                      v-model:is-active="isActiveEmailDialog"
+                      :email="email"
+                      :error-messages="emailMessage"
+                      @edit-user-email="editUserEmailBehavior"
+                      @reset-dialog="resetDialogBehavior"
+                    />
+                  </v-col>
+
+                  <v-col>
+                    <PasswordDialog
+                      v-model:is-valid="isValid"
+                      v-model:is-active="isActivePasswordDialog"
+                      :error-messages="passwordMessage"
+                      @edit-user-password="editUserPasswordBehavior"
+                      @reset-dialog="resetDialogBehavior"
+                    />
+                  </v-col>
+                </v-row>
+              </VContainer>
+            </v-card-text>
+          </v-card>
+        </template>
+      </v-dialog>
     </v-list>
     <v-divider></v-divider>
     <v-list nav density="compact">
@@ -17,38 +64,6 @@
       <v-list-item v-for="project in projects" :key="project.id" prepend-icon="mdi-account" nav />
     </v-list>
   </v-navigation-drawer>
-
-  <v-dialog v-model="dialog" width="auto">
-    <v-card title="Информация об аккаунте" max-width="400">
-      <v-card-text>
-        <VContainer class="ma-0 pa-0">
-          <v-row>
-            <v-col>
-              <NameDialog
-                :first-name="firstName"
-                :last-name="lastName"
-                :family="family"
-                @edit-user-name="editUserNameBehavior"
-              />
-            </v-col>
-
-            <v-col>
-              <email-dialog 
-                :email="email" 
-                @edit-user-email="editUserEmailBehavior" />
-            </v-col>
-
-            <v-col>
-              <PasswordDialog
-                :error-message="passwordMessage"
-                @edit-user-password="editUserPasswordBehavior"
-              />
-            </v-col>
-          </v-row>
-        </VContainer>
-      </v-card-text>
-    </v-card>
-  </v-dialog>
 
   <router-view />
 </template>
@@ -76,10 +91,14 @@ const password = ref<string>();
 const chats = ref<Array<Chat>>();
 const projects = ref<Array<Project>>();
 
-const emailMessage = ref<string>();
-const passwordMessage = ref<string>();
+const nameMessages = ref<Map<string, string>>(new Map<string, string>());
+const emailMessage = ref<string>('');
+const passwordMessage = ref<string>('');
 
-const dialog = ref<boolean>(false);
+const isValid = ref<boolean>(false);
+const isActiveNameDialog = ref<boolean>(false);
+const isActiveEmailDialog = ref<boolean>(false);
+const isActivePasswordDialog = ref<boolean>(false);
 
 provide('userChats', chats);
 provide('userId', id);
@@ -105,8 +124,8 @@ const editUserNameBehavior = async (
   newLastName: string,
   newFamily: string
 ) => {
-  try {
-    const response = await axios.put(
+  await axios
+    .put(
       'https://localhost:7229/api/user',
       {
         id: id.value,
@@ -120,8 +139,8 @@ const editUserNameBehavior = async (
           'Content-Type': 'application/json'
         }
       }
-    );
-    if (response.status === 200) {
+    )
+    .then((response) => {
       const data: Map<string, string> = new Map<string, string>(Object.entries(response.data));
       // console.log(data);
       if (data.has('FirstName')) {
@@ -133,15 +152,53 @@ const editUserNameBehavior = async (
       if (data.has('Family')) {
         family.value = data.get('Family');
       }
-    }
-  } catch (error: any) {
-    console.error('Error editing user name in:', error);
-  }
+      isValid.value = true;
+      isActiveNameDialog.value = false;
+      nameMessages.value = new Map<string, string>();
+    })
+    .catch((error) => {
+      if (error.response) {
+        if (error.response.status === 400) {
+          const errors = error.response.data?.errors;
+          if (errors) {
+            const errorMessages: Map<string, Array<string>> = new Map<string, Array<string>>(
+              Object.entries(errors)
+            );
+            if (errorMessages.has('')) {
+              let errorMessage: string = errorMessages.get('')?.[0] as string;
+              nameMessages.value?.set('FirstName', errorMessage);
+              nameMessages.value?.set('LastName', errorMessage);
+              nameMessages.value?.set('Family', errorMessage);
+            }
+            isValid.value = false;
+            isActiveNameDialog.value = true;
+            console.log(nameMessages.value);
+          }
+        }
+      }
+    });
 };
 
+const resetDialogBehavior = (typeDialog: string) => {
+  switch (typeDialog) {
+    case 'NameDialog':
+      nameMessages.value = new Map<string, string>();
+      isActiveNameDialog.value = false;
+      break;
+    case 'EmailDialog':
+      emailMessage.value = '';
+      isActiveEmailDialog.value = false;
+      break;
+    case 'PasswordDialog':
+      passwordMessage.value = '';
+      isActivePasswordDialog.value = false;
+      break;
+  }
+  isValid.value = false;
+};
 const editUserEmailBehavior = async (newEmail: string) => {
-  try {
-    const response = await axios.put(
+  await axios
+    .put(
       'https://localhost:7229/api/user',
       {
         id: id.value,
@@ -153,18 +210,36 @@ const editUserEmailBehavior = async (newEmail: string) => {
           'Content-Type': 'application/json'
         }
       }
-    );
-    if (response.status === 200) {
+    )
+    .then((response) => {
       const data: Map<string, string> = new Map<string, string>(Object.entries(response.data));
       // console.log(data);
-
       if (data.has('Email')) {
-        email.value = data.get('Email') as string;
+        email.value = data.get('Email');
       }
-    }
-  } catch (error) {
-    console.error('Error editing user Email in:', error);
-  }
+      isValid.value = true;
+      isActiveEmailDialog.value = false;
+      emailMessage.value = '';
+    })
+    .catch((error) => {
+      if (error.response) {
+        if (error.response.status === 400) {
+          const errors = error.response.data?.errors;
+          if (errors) {
+            const errorMessages: Map<string, Array<string>> = new Map<string, Array<string>>(
+              Object.entries(errors)
+            );
+            if (errorMessages.has('Email')) {
+              let errorMessage: string = errorMessages.get('Email')?.[0] as string;
+              emailMessage.value = errorMessage;
+            }
+            isValid.value = false;
+            isActiveEmailDialog.value = true;
+            console.log(emailMessage.value);
+          }
+        }
+      }
+    });
 };
 
 const editUserPasswordBehavior = async (newPassword: string) =>
@@ -195,7 +270,6 @@ const editUserPasswordBehavior = async (newPassword: string) =>
       if (error.response) {
         if (error.response.status === 400) {
           let errorMessage = error.response.data.errors[0];
-          console;
           console.log(errorMessage);
         }
       }

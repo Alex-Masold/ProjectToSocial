@@ -1,5 +1,5 @@
 <template>
-  <v-dialog width="auto" persistent>
+  <v-dialog v-model="isActive" width="auto" persistent>
     <template v-slot:activator="{ props: activatorProps }">
       <v-btn block v-bind="activatorProps" variant="text" style="justify-content: space-between">
         <template v-slot:prepend>
@@ -14,30 +14,32 @@
       </v-btn>
     </template>
 
-    <template v-slot:default="{ isActive }">
-      <v-form ref="form" v-model="valid">
+    <template v-slot:default>
+      <v-form v-model="isValid">
         <v-card title="Редактирование email">
           <v-card-text>
             <v-row no-gutters>
               <v-col>
                 <v-text-field
                   v-model="newEmail"
-                  :rules="emailRules"
                   variant="underlined"
                   label="email"
+                  :rules="emailRules"
+                  :messages="$props.errorMessages ? $props.errorMessages : ''"
                 >
                 </v-text-field>
               </v-col>
             </v-row>
           </v-card-text>
           <v-card-actions>
-            <v-btn text="Отмена" variant="text" @click="isActive.value = !isActive.value"></v-btn>
+            <v-btn text="Отмена" variant="text" @click="resetDialog"> </v-btn>
             <v-btn
-              :disabled="!valid"
               text="изменить email"
+              type="submit"
               variant="text"
-              @click="() => (editUserEmail(newEmail), (isActive.value = !isActive.value))">
-            </v-btn>
+              :disabled="!isValid"
+              @click="editUserEmail(newEmail)"
+            ></v-btn>
           </v-card-actions>
         </v-card>
       </v-form>
@@ -53,17 +55,22 @@ const props = defineProps({
     type: String,
     requare: true
   },
+  errorMessages: {
+    type: String,
+    requare: true
+  },
   iconSize: {
     type: Number,
     default: 32
   }
 });
 
-const emit = defineEmits(['editUserEmail']);
+const emit = defineEmits(['editUserEmail', 'resetDialog']);
 
-const newEmail = ref<string>("");
+const isValid = defineModel<boolean>('isValid', { required: true });
+const isActive = defineModel<boolean>('isActive', { required: true });
 
-const valid = ref(false);
+const newEmail = ref<string>('');
 
 const emailRules = [
   (value: string) => !!value || 'Поле обезаательно для заполнения',
@@ -79,6 +86,10 @@ const editUserEmail = (email: string) => {
   emit('editUserEmail', email);
 };
 
+const resetDialog = (): void => {
+  emit('resetDialog', 'EmailDialog');
+  newEmail.value = '';
+};
 </script>
 
 <style scoped></style>
