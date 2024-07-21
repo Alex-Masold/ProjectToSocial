@@ -16,9 +16,9 @@
       <v-form v-model="isValid">
         <v-card title="Редактирование пароля">
           <v-card-text>
-            <VRow no-gutters>
-              <VCol>
-                <VTextField
+            <v-row no-gutters>
+              <v-col>
+                <v-text-field
                   v-model="newPassword"
                   variant="underlined"
                   label="Пароль"
@@ -28,12 +28,12 @@
                   :type="showPassword ? 'text' : 'password'"
                   @click:append="showPassword = !showPassword"
                 >
-                </VTextField>
-              </VCol>
-            </VRow>
-            <VRow no-gutters>
-              <VCol>
-                <VTextField
+                </v-text-field>
+              </v-col>
+            </v-row>
+            <v-row no-gutters>
+              <v-col>
+                <v-text-field
                   v-model="passwordConfirm"
                   variant="underlined"
                   label="Повторите пароль"
@@ -43,19 +43,19 @@
                   :type="showConfirm ? 'text' : 'password'"
                   @click:append="showConfirm = !showConfirm"
                 />
-              </VCol>
-            </VRow>
+              </v-col>
+            </v-row>
           </v-card-text>
-          <VCardActions>
-            <VBtn text="Отмена" variant="text" @click="resetDialog"></VBtn>
-            <VBtn
+          <v-card-actions>
+            <v-btn text="Отмена" variant="text" @click="resetDialog"></v-btn>
+            <v-btn
               text="Потвердить"
               type="submit"
               variant="text"
               :disabled="!isValid"
               @click="editUserPassword(newPassword, passwordConfirm)"
-            ></VBtn>
-          </VCardActions>
+            ></v-btn>
+          </v-card-actions>
         </v-card>
       </v-form>
     </template>
