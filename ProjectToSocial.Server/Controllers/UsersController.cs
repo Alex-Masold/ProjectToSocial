@@ -25,7 +25,7 @@ namespace ProjectToSocial.Server.Controllers
             }
         }
 
-        [HttpGet("user/{id}")]
+        [HttpGet("users/{id}")]
         public async Task<ActionResult<User>> GetUser(int id)
         {
             using (ApplicationContext db = new ApplicationContext())
@@ -44,20 +44,20 @@ namespace ProjectToSocial.Server.Controllers
             }
         }
 
-        [HttpPut("user")]
-        public async Task<ActionResult<Dictionary<string, object>>> EditUser(
+        [HttpPatch("users/{id}")]
+        public async Task<ActionResult<Dictionary<string, object>>> EditUser(int id,
             [FromBody] UserQuery userData
         )
         {
             using (ApplicationContext db = new ApplicationContext())
             {
-                User user = await db.Users.FirstOrDefaultAsync(user => user.Id == userData.Id);
+                User user = await db.Users.FirstOrDefaultAsync(user => user.Id == id);
 
                 var changedFields = new Dictionary<string, object>();
 
                 if (user == null)
                 {
-                    return Content($"User {userData.Id} не найден");
+                    return Content($"User {id} не найден");
                 }
 
                 if (userData.IdRole != null)
@@ -152,7 +152,7 @@ namespace ProjectToSocial.Server.Controllers
                         user.Password = userData.Password;
                         changedFields[nameof(UserQuery.Password)] = userData.Password;
                     }
-                    if (userData.Avatar.IsNullOrEmpty())
+                    if (!userData.Avatar.IsNullOrEmpty())
                     {
                         user.Avatar = userData.Avatar;
                         changedFields[nameof(UserQuery.Avatar)] = userData.Avatar;

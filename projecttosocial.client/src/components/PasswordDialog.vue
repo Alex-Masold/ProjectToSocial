@@ -13,7 +13,7 @@
     </template>
 
     <template v-slot:default>
-      <v-form v-model="isValid">
+      <v-form v-model="isValid" @submit.prevent="editUserPassword(id as number, newPassword, passwordConfirm)">
         <v-card title="Редактирование пароля">
           <v-card-text>
             <v-row no-gutters>
@@ -53,7 +53,6 @@
               type="submit"
               variant="text"
               :disabled="!isValid"
-              @click="editUserPassword(newPassword, passwordConfirm)"
             ></v-btn>
           </v-card-actions>
         </v-card>
@@ -63,9 +62,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { inject, ref, type Ref } from 'vue';
 
-const props = defineProps({
+defineProps({
   errorMessages: {
     type: String,
     requare: true
@@ -80,6 +79,8 @@ const emit = defineEmits(['editUserPassword', 'resetDialog']);
 
 const isValid = defineModel<boolean>('isValid', { required: true });
 const isActive = defineModel<boolean>('isActive', { required: true });
+
+const id = inject<Ref<number>>('userId');
 
 const newPassword = ref<string>('');
 const passwordConfirm = ref<string>('');
@@ -99,8 +100,12 @@ const passwordConfirmRules = [
   (value: string) => !!value || 'Поле обезаательно для заполнения',
   (value: string) => value === newPassword.value || 'Пароли не совпадают'
 ];
-const editUserPassword = (password: string, passwordConfirm: string) => {
-  emit('editUserPassword', password, passwordConfirm);
+const editUserPassword = (id: number, password: string, Confirm: string) => {
+  emit('editUserPassword', id, password, Confirm);
+  newPassword.value = '';
+  passwordConfirm.value = '';
+  showPassword.value = false;
+  showConfirm.value = false;
 };
 
 const resetDialog = (): void => {

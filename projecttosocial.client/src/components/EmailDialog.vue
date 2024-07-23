@@ -15,7 +15,7 @@
     </template>
 
     <template v-slot:default>
-      <v-form v-model="isValid">
+      <v-form v-model="isValid" @submit.prevent="editUserEmail(id as number, newEmail)">
         <v-card title="Редактирование email">
           <v-card-text>
             <v-row no-gutters>
@@ -38,7 +38,6 @@
               type="submit"
               variant="text"
               :disabled="!isValid"
-              @click="editUserEmail(newEmail)"
             ></v-btn>
           </v-card-actions>
         </v-card>
@@ -48,9 +47,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { inject, ref, type Ref } from 'vue';
 
-const props = defineProps({
+defineProps({
   email: {
     type: String,
     requare: true
@@ -70,20 +69,23 @@ const emit = defineEmits(['editUserEmail', 'resetDialog']);
 const isValid = defineModel<boolean>('isValid', { required: true });
 const isActive = defineModel<boolean>('isActive', { required: true });
 
+const id = inject<Ref<number>>('userId');
+
 const newEmail = ref<string>('');
 
 const emailRules = [
   (value: string) => !!value || 'Поле обезаательно для заполнения',
-  (value: string) => value !== props.email || 'Это текущий email',
   (value: string) => {
     const pattern =
       /^([a-zA-Z0-9]+(\.[a-zA-Z0-9]+)*)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     return pattern.test(value) || 'Неверный email';
+  // (value: string) => value !== props.email || 'Это текущий email',
   }
 ];
 
-const editUserEmail = (email: string) => {
-  emit('editUserEmail', email);
+const editUserEmail = (id: number, email: string) => {
+  emit('editUserEmail',id, email);
+  newEmail.value = '';
 };
 
 const resetDialog = (): void => {

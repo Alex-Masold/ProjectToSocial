@@ -69,13 +69,13 @@
 </template>
 
 <script setup lang="ts">
+import { getUser, updateUserEmail, updateUserName, updateUserPassword } from '@/api/user/userController';
 import EmailDialog from '@/components/EmailDialog.vue';
 import NameDialog from '@/components/NameDialog.vue';
 import PasswordDialog from '@/components/PasswordDialog.vue';
 import type { Chat } from '@/models/Chat';
 import type { Project } from '@/models/Project';
 import type { User } from '@/models/User';
-import axios from 'axios';
 import { onMounted, provide, ref } from 'vue';
 import { onBeforeRouteUpdate, useRoute } from 'vue-router';
 
@@ -103,10 +103,9 @@ const isActivePasswordDialog = ref<boolean>(false);
 provide('userChats', chats);
 provide('userId', id);
 
-const getUser = async (id: number) => {
+const fetchUser = async (id: number): Promise<User | undefined> => {
   try {
-    const response = await axios.get(`https://localhost:7229/api/user/${id}`);
-
+    const response = await getUser(id);
     if (response.status === 200) {
       const data: User = response.data;
       return data;
@@ -120,26 +119,12 @@ const getUser = async (id: number) => {
 };
 
 const editUserNameBehavior = async (
+  id: number,
   newFirstName: string,
   newLastName: string,
   newFamily: string
 ) => {
-  await axios
-    .put(
-      'https://localhost:7229/api/user',
-      {
-        id: id.value,
-        firstName: newFirstName,
-        lastName: newLastName,
-        family: newFamily
-      },
-      {
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json'
-        }
-      }
-    )
+  await updateUserName(id, newFirstName, newLastName, newFamily)
     .then((response) => {
       const data: Map<string, string> = new Map<string, string>(Object.entries(response.data));
       // console.log(data);
@@ -179,38 +164,8 @@ const editUserNameBehavior = async (
     });
 };
 
-const resetDialogBehavior = (typeDialog: string) => {
-  switch (typeDialog) {
-    case 'NameDialog':
-      nameMessages.value = new Map<string, string>();
-      isActiveNameDialog.value = false;
-      break;
-    case 'EmailDialog':
-      emailMessage.value = '';
-      isActiveEmailDialog.value = false;
-      break;
-    case 'PasswordDialog':
-      passwordMessage.value = '';
-      isActivePasswordDialog.value = false;
-      break;
-  }
-  isValid.value = false;
-};
-const editUserEmailBehavior = async (newEmail: string) => {
-  await axios
-    .put(
-      'https://localhost:7229/api/user',
-      {
-        id: id.value,
-        email: newEmail
-      },
-      {
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json'
-        }
-      }
-    )
+const editUserEmailBehavior = async (id: number, newEmail: string) => {
+  await updateUserEmail(id, newEmail)
     .then((response) => {
       const data: Map<string, string> = new Map<string, string>(Object.entries(response.data));
       // console.log(data);
@@ -242,21 +197,8 @@ const editUserEmailBehavior = async (newEmail: string) => {
     });
 };
 
-const editUserPasswordBehavior = async (newPassword: string) =>
-  await axios
-    .put(
-      'https://localhost:7229/api/user',
-      {
-        id: id.value,
-        password: newPassword
-      },
-      {
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json'
-        }
-      }
-    )
+const editUserPasswordBehavior = async (id: number, newPassword: string, passwordConfirm: string) =>
+  await updateUserPassword(id, newPassword, passwordConfirm)
     .then((response) => {
       if (response.status === 200) {
         const data: Map<string, string> = new Map<string, string>(Object.entries(response.data));
@@ -275,6 +217,24 @@ const editUserPasswordBehavior = async (newPassword: string) =>
       }
     });
 
+const resetDialogBehavior = (typeDialog: string) => {
+  switch (typeDialog) {
+    case 'NameDialog':
+      nameMessages.value = new Map<string, string>();
+      isActiveNameDialog.value = false;
+      break;
+    case 'EmailDialog':
+      emailMessage.value = '';
+      isActiveEmailDialog.value = false;
+      break;
+    case 'PasswordDialog':
+      passwordMessage.value = '';
+      isActivePasswordDialog.value = false;
+      break;
+  }
+  isValid.value = false;
+};
+
 const fillUser = (userData: User): void => {
   id.value = userData.id;
 
@@ -291,7 +251,7 @@ const fillUser = (userData: User): void => {
 const loadUserData = async () => {
   const userId = Number(route.params.userId);
   if (!isNaN(userId)) {
-    const data = await getUser(userId);
+    const data = await fetchUser(userId);
     if (data) {
       console.log(data + ' ' + 'from loadUserData');
       fillUser(data);
@@ -300,7 +260,7 @@ const loadUserData = async () => {
 };
 
 onBeforeRouteUpdate(async (to) => {
-  const data = await getUser(Number(to.params.userId));
+  const data = await fetchUser(Number(to.params.userId));
   if (data) {
     console.log(data + ' ' + 'from onBeforeRouteUpdate');
     fillUser(data);

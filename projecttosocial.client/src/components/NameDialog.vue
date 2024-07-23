@@ -15,7 +15,7 @@
     </template>
 
     <template v-slot:default>
-      <v-form v-model="isValid">
+      <v-form v-model="isValid" @submit.prevent="editUserName(id as number,firstName, lastName, family)">
         <v-card title="Редактирование имени">
           <v-card-text>
             <v-row no-gutters>
@@ -62,7 +62,6 @@
               variant="text"
               type="submit"
               :disabled="!isValid"
-              @click="editUserName(firstName, lastName, family)"
             ></v-btn>
           </v-card-actions>
         </v-card>
@@ -72,7 +71,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { inject, ref, type Ref } from 'vue';
 
 const props = defineProps({
   firstName: {
@@ -102,6 +101,8 @@ const emit = defineEmits(['editUserName', 'resetDialog']);
 const isValid = defineModel<boolean>('isValid', { required: true });
 const isActive = defineModel<boolean>('isActive', { required: true });
 
+const id = inject<Ref<number>>('userId');
+
 const firstName = ref<string>(props.firstName as string);
 const lastName = ref<string>(props.lastName as string);
 const family = ref<string>(props.family as string);
@@ -114,8 +115,8 @@ const nameRules = [
     'В поле должны быть только буквы'
 ];
 
-const editUserName = (firstName: string, lastName: string, family: string): void => {
-  emit('editUserName', firstName, lastName, family);
+const editUserName = (id: number, firstName: string, lastName: string, family: string): void => {
+  emit('editUserName', id, firstName, lastName, family);
 };
 
 const resetDialog = (): void => {
